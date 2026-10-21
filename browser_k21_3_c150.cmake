@@ -22,7 +22,7 @@ target_compile_options(browser_k21_3_c150 PRIVATE
 target_include_directories(browser_k21_3_c150 PRIVATE
     "${BROWSER_K21_3_C150_DIR}/src"
     "${BROWSER_K21_3_C150_DIR}/../xbmc-Omega-git/xbmc"
-    "${CEF_ROOT}"
+    "${BROWSER_K21_3_C150_DIR}/CEF-Header"
 )
 
 target_link_libraries(browser_k21_3_c150 PRIVATE
@@ -50,7 +50,7 @@ target_compile_options(browser_k21_3_c150_helper PRIVATE
 )
 
 target_include_directories(browser_k21_3_c150_helper PRIVATE
-    "${CEF_ROOT}"
+    "${BROWSER_K21_3_C150_DIR}/CEF-Header"
 )
 
 target_link_libraries(browser_k21_3_c150_helper PRIVATE
@@ -81,7 +81,7 @@ target_compile_features(browser_k21_3_c150_standalone PRIVATE cxx_std_17)
 target_compile_options(browser_k21_3_c150_standalone PRIVATE -fno-rtti)
 
 target_include_directories(browser_k21_3_c150_standalone PRIVATE
-    "${CEF_ROOT}"
+    "${BROWSER_K21_3_C150_DIR}/CEF-Header"
 )
 
 target_link_libraries(browser_k21_3_c150_standalone PRIVATE
