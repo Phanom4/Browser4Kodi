@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="hbbtv-hts"
+       name="HbbTV"
+       version="0.1.0"
+       provider-name="Phanom4">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+
+    <extension point="xbmc.python.script"
+               library="main.py"/>
+
+    <extension point="xbmc.service"
+               library="service.py"
+               start="startup"/>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">HbbTV über TVHeadend</summary>
+        <description lang="de_DE">HbbTV-Sender aus TVHeadend</description>
+        <platform>all</platform>
+        <license>GPL-2.0-only</license>
+    </extension>
+
+</addon>

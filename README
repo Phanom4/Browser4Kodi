@@ -1,0 +1,43 @@
+browser_k21_3_c150  = Programm_Kodiversion_CEFversion
+Variante	Vorgehen
+1 – Alles kompilieren	Mit Git gelieferte, bereits kompilierte Komponenten vorher entfernen und CEF sowie Browser vollständig neu bauen 
+2 – Nur Browser kompilieren	Vorhandene CEF-Binärdateien behalten, nur Browser neu bauen
+3 – Nichts kompilieren	Vorhandene Binärdateien verwenden und direkt installieren
+
+python browser_k21_3_c150_install_0_1.py -1
+Voraussetzung		Installer 1	Installer 2		Installer 3
+Kodi 			Ja		Ja			Ja
+Python 3 für Installer	Ja		Ja			Ja
+Git und Build-Werkzeuge	Ja		Ja			Nein
+C++-Compiler / CMake	Ja		Ja			Nein
+CEF-LTS-Quellen		Ja		Nein			Nein
+Fertiges CEF-Paket	Nein		Ja			Bereits installiert
+Kompilierter Browser	Wird erstellt	Wird erstellt		Bereits installiert
+
+#############################
+#Installer 1
+#############################
+Nutzer lädt GitHub-Projekt herunter.
+
+Falls erforderlich, kompiliert er CEF und Browser.
+
+Er führt einmal manuell browser_k21_3_c150_install_0_1.py -1 aus.
+
+Der Installer kopiert alle benötigten Browserdateien nach ~/.kodi/browser/.
+
+Er installiert optional HbbTV unter ~/.kodi/addons/hbbtv-hts/.
+
+Er installiert das zusätzliche Browser-Installer-Add-on in Kodi.
+
+Die Skin-Einträge werden eingerichtet.
+
+#############################
+#Installer 2
+#############################
+
+
+
+
+#############################
+#Installer 3
+#############################

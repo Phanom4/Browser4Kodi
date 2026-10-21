@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# CMake
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+
+# Compiler
+*.o
+*.a
+*.so
+*.so.*
+
+# Logs
+*.log
