@@ -52,6 +52,45 @@ Für Entwickler, die die komplette Browserumgebung selbst bauen möchten.
 **Auch hier wird Kodi selbst nicht neu kompiliert.**
 Für den Browser-Build werden weiterhin passende Kodi-Header benötigt.
 
+#### Variante 3: sauberer Neuaufbau (geplant)
+
+Variante 3 darf keine alten, fertig gelieferten CEF- oder Browser-Binärdateien
+aus Variante 1 oder 2 ungeprüft übernehmen. Der Ablauf soll daher sein:
+
+1. Vorhandene Build- und Installationsdateien anhand ihrer Herkunft
+   unterscheiden: Quellen, erzeugte Dateien, Laufzeitdateien und Nutzerdaten.
+2. **Vor dem Neubau** die alten *erzeugten* Browser-Builddateien aus dem
+   vorgesehenen Build-Verzeichnis entfernen.
+3. CEF aus den Quellen bauen; dabei dürfen keine bereits mitgelieferten
+   CEF-Binärdateien als Ergebnis des neuen Builds gelten.
+4. Browser und CEF-Hilfsprogramm gegen dieses neu gebaute CEF kompilieren.
+5. Den neuen Satz benötigter Laufzeitdateien vollständig zusammenstellen
+   und erst danach veraltete Dateien der vorherigen Installationsvariante
+   im Installationsziel ersetzen.
+
+Die Aufräumregeln gelten **auch beim Wechsel zwischen den Varianten**.
+Insbesondere darf Variante 3 nicht einfach zusätzliche Dateien über die
+fertige Installation aus Variante 1 kopieren.
+
+| Bereich | Bei Variante 3 |
+| --- | --- |
+| `src/`, `addon/`, CMake-Dateien, Python-Quellen | Erhalten |
+| Browser-Buildverzeichnis (`build/`) | Alte Build-Ergebnisse vor dem Neuaufbau entfernen |
+| CEF-Quellverzeichnis | Erhalten; hieraus CEF neu bauen |
+| CEF-Laufzeitverzeichnis (`cef/`) | Mit dem neu gebauten CEF bestücken; alte Binärdateien nicht mischen |
+| Installationsziel des Browsers | Veraltete *installierte Programmdateien* beim Ersetzen beseitigen |
+| Chromium-`cache/`, Cookies, History und Benutzereinstellungen | **Erhalten, nicht löschen** |
+| Git-Metadaten und bereits installiertes Kodi | Erhalten |
+
+**Wichtig:** Ein Ordner `cef/` kann lokal mehr enthalten als nur Laufzeitdateien.
+Der Installer darf daher nicht pauschal `cef/` oder ganze Benutzerprofile
+löschen. Erst wenn Quell-, Build- und Installationspfade feststehen, wird die
+selektive Bereinigung programmiert. Eine bestehende Installation wird nicht
+vorzeitig zerstört, falls der CEF- oder Browser-Build fehlschlägt.
+
+**Status:** Diese Aufräum- und Neuaufbauschritte sind das festgelegte Ziel
+für Variante 3, **noch keine implementierte Installer-Funktion**.
+
 ## Voraussetzungen im Überblick
 
 | Voraussetzung | 1 – Einfach | 2 – Nur Browser | 3 – CEF + Browser |
