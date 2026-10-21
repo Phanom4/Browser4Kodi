@@ -1,43 +1,107 @@
-browser_k21_3_c150  = Programm_Kodiversion_CEFversion
-Variante	Vorgehen
-1 – Alles kompilieren	Mit Git gelieferte, bereits kompilierte Komponenten vorher entfernen und CEF sowie Browser vollständig neu bauen 
-2 – Nur Browser kompilieren	Vorhandene CEF-Binärdateien behalten, nur Browser neu bauen
-3 – Nichts kompilieren	Vorhandene Binärdateien verwenden und direkt installieren
+# Browser4Kodi
 
-python browser_k21_3_c150_install_0_1.py -1
-Voraussetzung		Installer 1	Installer 2		Installer 3
-Kodi 			Ja		Ja			Ja
-Python 3 für Installer	Ja		Ja			Ja
-Git und Build-Werkzeuge	Ja		Ja			Nein
-C++-Compiler / CMake	Ja		Ja			Nein
-CEF-LTS-Quellen		Ja		Nein			Nein
-Fertiges CEF-Paket	Nein		Ja			Bereits installiert
-Kompilierter Browser	Wird erstellt	Wird erstellt		Bereits installiert
+Browser4Kodi ist ein in Entwicklung befindlicher Browser für Kodi auf Basis des
+Chromium Embedded Framework (CEF). Die Browserdarstellung wird in Kodi
+eingebunden; ein Neubau des Kodi-Hauptprogramms ist dafür nicht vorgesehen.
 
-#############################
-#Installer 1
-#############################
-Nutzer lädt GitHub-Projekt herunter.
+Die Projektbezeichnung `browser_k21_3_c150` steht für die Zielkombination
+Kodi 21.3 (Omega) und CEF/Chromium 150.
 
-Falls erforderlich, kompiliert er CEF und Browser.
+**Status:** Entwicklungsprojekt. Noch keine fertige, allgemein nutzbare
+Installationsveröffentlichung.
 
-Er führt einmal manuell browser_k21_3_c150_install_0_1.py -1 aus.
+## Installation: drei Varianten
 
-Der Installer kopiert alle benötigten Browserdateien nach ~/.kodi/browser/.
+Die drei vorgesehenen Installationswege sind nach Aufwand sortiert.
+**Bei keiner Variante wird Kodi selbst neu kompiliert.**
+Kodi muss bereits vorhanden sein.
 
-Er installiert optional HbbTV unter ~/.kodi/addons/hbbtv-hts/.
+### 1 – Einfach: Fertige Komponenten installieren
 
-Er installiert das zusätzliche Browser-Installer-Add-on in Kodi.
+Für Anwender, die den Browser nur verwenden möchten.
 
-Die Skin-Einträge werden eingerichtet.
+- Fertig kompilierte CEF- und Browserkomponenten verwenden.
+- Keine Compiler-, CMake- oder CEF-Quellcodeumgebung benötigen.
+- Browser und Kodi-Einbindung über den Installer einrichten.
 
-#############################
-#Installer 2
-#############################
+**Status:** Als Installationsvariante vorgesehen. Das Git-Repository liefert
+derzeit keine vollständigen fertigen Binärpakete mit; dieser Weg ist deshalb
+noch nicht als direkte Installation aus dem Repository verfügbar.
 
+### 2 – Erweitert: Nur den Browser kompilieren
 
+Für Anwender, die den Browser selbst bauen möchten, aber CEF nicht neu
+kompilieren wollen.
 
+- Bereits gebaute, zur Browserversion passende CEF-Bibliotheken und Header
+  bereitstellen.
+- Die Browserkomponenten mit CMake und einem C++-Compiler kompilieren.
+- Den gebauten Browser anschließend installieren.
 
-#############################
-#Installer 3
-#############################
+**Kodi und CEF werden dabei nicht neu kompiliert.**
+
+### 3 – Vollständig: CEF und Browser kompilieren
+
+Für Entwickler, die die komplette Browserumgebung selbst bauen möchten.
+
+- Passende CEF-Quellen und die benötigte Build-Umgebung bereitstellen.
+- CEF einschließlich der benötigten Bibliotheken bauen.
+- Anschließend die Browserkomponenten gegen das selbst gebaute CEF
+  kompilieren und installieren.
+
+**Auch hier wird Kodi selbst nicht neu kompiliert.**
+Für den Browser-Build werden weiterhin passende Kodi-Header benötigt.
+
+## Voraussetzungen im Überblick
+
+| Voraussetzung | 1 – Einfach | 2 – Nur Browser | 3 – CEF + Browser |
+| --- | --- | --- | --- |
+| Bereits installiertes Kodi | Ja | Ja | Ja |
+| Python 3 für den Installer | Ja | Ja | Ja |
+| C++-Compiler und CMake | Nein | Ja | Ja |
+| Passende CEF-Bibliotheken | Fertig mitgeliefert (geplant) | Bereits vorhanden | Werden gebaut |
+| CEF-Quellen | Nein | Nein | Ja |
+| Browser-Binärdateien | Fertig mitgeliefert (geplant) | Werden gebaut | Werden gebaut |
+| Kodi selbst kompilieren | Nein | Nein | Nein |
+
+## Aktueller Entwicklungsstand der Installation
+
+Das Repository enthält bereits einen Python-Installer und die CMake-Definition
+für den Browser. Die drei oben beschriebenen Installationsvarianten sind aber
+noch nicht als vollständig automatisierte Auswahl implementiert.
+
+Der vorhandene Installer heißt
+`browser_k21_3_c150_install_0_1.py` und kennt folgende Aufrufe:
+
+```bash
+python3 browser_k21_3_c150_install_0_1.py -1
+python3 browser_k21_3_c150_install_0_1.py -0
+python3 browser_k21_3_c150_install_0_1.py -rm
+```
+
+Dabei steht `-1` für Installation, `-0` für Deinstallation und `-rm`
+für vollständiges Entfernen. Diese Optionen sind **keine Auswahl der drei
+Build-Varianten**.
+
+Der Installer richtet bereits Teile der Python-/Kodi-Einbindung, des
+Browser-Installer-Add-ons und der Skin-Integration ein. Die vollständige
+Bereitstellung aller Browser- und CEF-Laufzeitdateien ist noch in Arbeit.
+Die aktuelle Implementierung verwendet vorläufig Kodi-Profilpfade unter
+`~/.kodi/` und richtet sich an die Linux-Entwicklungsumgebung.
+
+Die CMake-Dateien erwarten passende CEF-Dateien unter `cef/` und
+Kodi-Header aus einem benachbarten `../xbmc-Omega-git/xbmc`-Verzeichnis.
+Diese externen Voraussetzungen müssen derzeit selbst bereitgestellt werden.
+
+## Projektaufbau
+
+- `src/` – C++-Quellcode des Browsers, CEF-Einbindung und Hilfsprogramm
+- `browser_k21_3_c150.cmake` und `CMakeLists.txt` – Browser-Build
+- `browser_k21_3_c150_install_0_1.py` – zentraler Installer
+- `browser_k21_3_c150_skin.py` – Kodi-Skin-Integration
+- `browser_k21_3_c150_load.py` – Browserstart und laufende CEF-Steuerung
+- `addon/installer/` – Installer-Add-on für Kodi
+- `addon/HBBTV/` – zusätzliche HbbTV-Integration
+
+Die Installation und die Dokumentation werden während der Entwicklung
+schrittweise vervollständigt.
