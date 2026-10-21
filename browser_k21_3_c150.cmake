@@ -2,6 +2,7 @@
 
 set(BROWSER_K21_3_C150_DIR "${CMAKE_CURRENT_LIST_DIR}")
 set(CEF_ROOT "${BROWSER_K21_3_C150_DIR}/cef")
+get_filename_component(CEF_WRAPPER_REALPATH "${CEF_ROOT}/libcef_dll_wrapper.a" REALPATH)
 
 add_library(browser_k21_3_c150 SHARED
     "${BROWSER_K21_3_C150_DIR}/src/browser_k21_3_c150.cpp"
@@ -26,7 +27,7 @@ target_include_directories(browser_k21_3_c150 PRIVATE
 )
 
 target_link_libraries(browser_k21_3_c150 PRIVATE
-    "${CEF_ROOT}/libcef_dll_wrapper.a"
+    "${CEF_WRAPPER_REALPATH}"
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
@@ -54,7 +55,7 @@ target_include_directories(browser_k21_3_c150_helper PRIVATE
 )
 
 target_link_libraries(browser_k21_3_c150_helper PRIVATE
-    "${CEF_ROOT}/libcef_dll_wrapper.a"
+    "${CEF_WRAPPER_REALPATH}"
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
@@ -69,31 +70,6 @@ target_link_libraries(browser_k21_3_c150 PRIVATE avformat avcodec avutil)
 
 # CEF-Laufzeit bleibt innerhalb des Kodi-Prozesses bestehen.
 target_link_options(browser_k21_3_c150 PRIVATE "-Wl,-z,nodelete")
-
-# Eigenständiger CEF-Browser mit Chromium Views
-# Unabhängig von Kodi, OSR und NUT.
-add_executable(browser_k21_3_c150_standalone
-    "${BROWSER_K21_3_C150_DIR}/src/browser_k21_3_c150_standalone.cpp"
-)
-
-target_compile_features(browser_k21_3_c150_standalone PRIVATE cxx_std_17)
-
-target_compile_options(browser_k21_3_c150_standalone PRIVATE -fno-rtti)
-
-target_include_directories(browser_k21_3_c150_standalone PRIVATE
-    "${BROWSER_K21_3_C150_DIR}/CEF-Header"
-)
-
-target_link_libraries(browser_k21_3_c150_standalone PRIVATE
-    "${CEF_ROOT}/libcef_dll_wrapper.a"
-    "${CEF_ROOT}/libcef.so"
-    pthread
-    dl
-)
-
-set_target_properties(browser_k21_3_c150_standalone PROPERTIES
-    BUILD_RPATH "${CEF_ROOT}"
-)
 
 # Kodi-interne RetroPlayer-Header benötigen TARGET_POSIX
 target_compile_definitions(browser_k21_3_c150 PRIVATE TARGET_POSIX)

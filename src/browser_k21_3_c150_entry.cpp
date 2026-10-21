@@ -15,6 +15,7 @@
 #include <condition_variable>
 #include <cstdlib>
 #include <filesystem>
+#include <dlfcn.h>
 #include <mutex>
 #include <thread>
 
@@ -25,8 +26,6 @@ CefRefPtr<CefAudioHandler> browser_k21_3_c150_create_audio_handler();
 
 namespace
 {
-const fs::path cef = base / "cef";
-const fs::path build = base / "build";
 
 
 
@@ -593,7 +592,18 @@ void OwnerThread()
 {
     namespace fs = std::filesystem;
 
-    const fs::path base(BASE);
+    Dl_info info{};
+    if (dladdr(reinterpret_cast<void*>(&OwnerThread), &info) == 0 ||
+        !info.dli_fname)
+    {
+        std::lock_guard<std::mutex> lock(g_mutex);
+        g_ready = true;
+        g_cv.notify_all();
+        return;
+    }
+
+    const fs::path base =
+        fs::absolute(info.dli_fname).parent_path().parent_path();
     const fs::path cef = base / "cef";
     const fs::path build = base / "build";
 
