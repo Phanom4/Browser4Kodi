@@ -21,7 +21,7 @@ target_compile_options(browser_k21_3_c150 PRIVATE
 
 target_include_directories(browser_k21_3_c150 PRIVATE
     "${BROWSER_K21_3_C150_DIR}/src"
-    "${BROWSER_K21_3_C150_DIR}/../xbmc-Omega-git/xbmc"
+    "${BROWSER_K21_3_C150_DIR}/Kodi-Header/xbmc"
     "${BROWSER_K21_3_C150_DIR}/CEF-Header"
 )
 
