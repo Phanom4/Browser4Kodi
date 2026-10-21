@@ -17,3 +17,6 @@ CMakeCache.txt
 
 # Logs
 *.log
+
+# Lokale Arbeits- und Testumgebung
+/test/
