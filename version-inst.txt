@@ -25,9 +25,16 @@ wget https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automat
 sed -i "s/sync_args = '--nohooks '/sync_args = '--nohooks --jobs=1 '/" automate-git.py
 python3 automate-git.py --download-dir="$(pwd)" --branch=7871 --no-build --no-distrib --no-chromium-history --x64-build
 
-CEF
-GN_DEFINES="is_official_build=true use_sysroot=true symbol_level=1 is_cfi=false use_thin_lto=false chrome_pgo_phase=0" python3 automate-git.py --download-dir="$(pwd)" --branch=7871 --no-update --force-build --no-debug-build --build-target=cefsimple --x64-build --no-chromium-history
-
+GN_DEFINES="is_official_build=true use_sysroot=true symbol_level=1 is_cfi=false use_thin_lto=false chrome_pgo_phase=0" \
+python3 automate-git.py \
+  --download-dir="$(pwd)" \
+  --branch=7871 \
+  --no-update \
+  --force-build \
+  --no-debug-build \
+  --build-target=cefsimple \
+  --x64-build \
+  --no-chromium-history
 
 Browser4Kodi
 19:33
