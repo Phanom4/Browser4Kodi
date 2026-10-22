@@ -2,10 +2,6 @@
 
 set(BROWSER_K21_3_C150_DIR "${CMAKE_CURRENT_LIST_DIR}")
 set(CEF_ROOT "${BROWSER_K21_3_C150_DIR}/chromium/src/out/Release_GN_x64")
-set(CEF_WRAPPER
-    "${BROWSER_K21_3_C150_DIR}/build/cef-wrapper-gcc/libcef_dll_wrapper/libcef_dll_wrapper.a"
-)
-
 file(GLOB CEF_DISTRIBUTIONS
     "${BROWSER_K21_3_C150_DIR}/chromium/src/cef/binary_distrib/cef_binary_*_linux64"
 )
@@ -15,6 +11,51 @@ if(NOT CEF_COUNT EQUAL 1)
     message(FATAL_ERROR "Genau eine CEF-Binary-Distribution erforderlich")
 endif()
 list(GET CEF_DISTRIBUTIONS 0 CEF_HEADER_ROOT)
+
+# ============================================================
+# GCC-CEF-Wrapper automatisch bauen (ein Build, keine Handarbeit)
+# ============================================================
+# CEF 150 wurde mit Chromium-Clang/libc++ gebaut. Der C++-Wrapper
+# muss dagegen wie Browser4Kodi mit GCC/libstdc++ gebaut werden.
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(FATAL_ERROR "Browser4Kodi mit GCC konfigurieren: CEF-Wrapper braucht dieselbe C++-ABI")
+endif()
+
+find_program(CEF_GCC_EXECUTABLE NAMES gcc REQUIRED)
+include(ExternalProject)
+
+# Der Wrapper wird im aktuellen Build-Verzeichnis erzeugt.
+# Damit funktioniert auch ein vollständig leeres build/.
+set(CEF_WRAPPER_BUILD_DIR "${CMAKE_BINARY_DIR}/cef-wrapper-gcc")
+set(CEF_WRAPPER
+    "${CEF_WRAPPER_BUILD_DIR}/libcef_dll_wrapper/libcef_dll_wrapper.a"
+)
+set(CEF_WRAPPER_JOBS 32 CACHE STRING "Parallele Jobs beim Bau des GCC-CEF-Wrappers")
+
+ExternalProject_Add(cef_wrapper_gcc_build
+    SOURCE_DIR "${CEF_HEADER_ROOT}"
+    BINARY_DIR "${CEF_WRAPPER_BUILD_DIR}"
+    CMAKE_GENERATOR "Ninja"
+    DOWNLOAD_COMMAND ""
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    CMAKE_ARGS
+        "-DCMAKE_C_COMPILER:FILEPATH=${CEF_GCC_EXECUTABLE}"
+        "-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
+        "-DCMAKE_BUILD_TYPE:STRING=Release"
+    BUILD_COMMAND
+        "${CMAKE_COMMAND}" --build <BINARY_DIR>
+        --target libcef_dll_wrapper --parallel "${CEF_WRAPPER_JOBS}"
+    INSTALL_COMMAND ""
+    BUILD_BYPRODUCTS "${CEF_WRAPPER}"
+)
+
+# Erst den Wrapper bauen, danach Browser und Helper linken.
+add_library(cef_wrapper_gcc STATIC IMPORTED GLOBAL)
+set_target_properties(cef_wrapper_gcc PROPERTIES
+    IMPORTED_LOCATION "${CEF_WRAPPER}"
+)
+add_dependencies(cef_wrapper_gcc cef_wrapper_gcc_build)
 
 add_library(browser_k21_3_c150 SHARED
     "${BROWSER_K21_3_C150_DIR}/src/browser_k21_3_c150.cpp"
@@ -39,7 +80,7 @@ target_include_directories(browser_k21_3_c150 PRIVATE
 )
 
 target_link_libraries(browser_k21_3_c150 PRIVATE
-    "${CEF_WRAPPER}"
+    cef_wrapper_gcc
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
@@ -67,7 +108,7 @@ target_include_directories(browser_k21_3_c150_helper PRIVATE
 )
 
 target_link_libraries(browser_k21_3_c150_helper PRIVATE
-    "${CEF_WRAPPER}"
+    cef_wrapper_gcc
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
@@ -97,5 +138,3 @@ foreach(target browser_k21_3_c150 browser_k21_3_c150_helper)
         "-B${CEF_LLD_BIN}/"
     )
 endforeach()
-
-
