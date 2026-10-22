@@ -27,7 +27,7 @@ Qellen
 mkdir Browser4Kodi
 cd Browser4Kodi 
 git clone https://github.com/Phanom4/Browser4Kodi.git .
-rm -R cef
+rm -rf cef chromium
 git clone --branch 7871 --single-branch https://github.com/chromiumembedded/cef.git cef
 wget https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automate/automate-git.py
 sed -i "s/sync_args = '--nohooks '/sync_args = '--nohooks --jobs=1 '/" automate-git.py
@@ -45,7 +45,7 @@ python3 automate-git.py \
   --no-chromium-history
 
 Browser4Kodi
-19:33
+
 cmake -S . -B build && cmake --build build -j 64
 
 
