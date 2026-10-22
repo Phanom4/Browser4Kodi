@@ -2,7 +2,9 @@
 
 set(BROWSER_K21_3_C150_DIR "${CMAKE_CURRENT_LIST_DIR}")
 set(CEF_ROOT "${BROWSER_K21_3_C150_DIR}/chromium/src/out/Release_GN_x64")
-set(CEF_WRAPPER "${CEF_ROOT}/obj/cef/libcef_dll_wrapper.a")
+set(CEF_WRAPPER
+    "${BROWSER_K21_3_C150_DIR}/build/cef-wrapper-gcc/libcef_dll_wrapper/libcef_dll_wrapper.a"
+)
 
 file(GLOB CEF_DISTRIBUTIONS
     "${BROWSER_K21_3_C150_DIR}/chromium/src/cef/binary_distrib/cef_binary_*_linux64"
@@ -96,17 +98,4 @@ foreach(target browser_k21_3_c150 browser_k21_3_c150_helper)
     )
 endforeach()
 
-# Chromium C++-Laufzeit für den CEF-150-Wrapper
-set(CEF_LIBCXX
-    "${CEF_ROOT}/obj/buildtools/third_party/libc++/libc++.a"
-)
-set(CEF_LIBCXXABI
-    "${CEF_ROOT}/obj/buildtools/third_party/libc++abi/libc++abi.a"
-)
 
-foreach(target browser_k21_3_c150 browser_k21_3_c150_helper)
-    target_link_libraries(${target} PRIVATE
-        "${CEF_LIBCXX}"
-        "${CEF_LIBCXXABI}"
-    )
-endforeach()

@@ -132,10 +132,98 @@ try:
         # ====================================================
         # BROWSER
         # ====================================================
-        # Browser holt seine Bibliotheken und Laufzeitdateien
-        # selbst und richtet seine eigenen Skin-Eintraege ein.
-        subprocess.run([sys.executable, str(browser_programm), "-1"], check=True)
-        print("Browser: eigene Installation abgeschlossen")
+        
+        # ====================================================
+        # BROWSER - DATEIEN INSTALLIEREN
+        # ====================================================
+
+        if BASE != BROWSER:
+
+            # Quellverzeichnisse
+            quelle_build = BASE / "build"
+            quelle_cef = BASE / "chromium/src/out/Release_GN_x64"
+
+            # Zielverzeichnisse
+            ziel_build = BROWSER / "build"
+            ziel_cef = BROWSER / "cef"
+
+            ziel_build.mkdir(parents=True, exist_ok=True)
+            ziel_cef.mkdir(parents=True, exist_ok=True)
+
+            # ====================================================
+            # BROWSER - KOMPILIERTE DATEIEN
+            # ====================================================
+
+            for name in (
+                "browser_k21_3_c150.so",
+                "browser_k21_3_c150_helper",
+            ):
+                quelle = quelle_build / name
+
+                if not quelle.is_file():
+                    raise FileNotFoundError(f"Browser: {quelle} fehlt")
+
+                shutil.copy2(quelle, ziel_build / name)
+                print(f"Browser kopiert: {name}")
+
+            # ====================================================
+            # CEF - LAUFZEITDATEIEN
+            # ====================================================
+
+            for name in (
+                "libcef.so",
+                "chrome_100_percent.pak",
+                "chrome_200_percent.pak",
+                "resources.pak",
+                "icudtl.dat",
+                "libEGL.so",
+                "libGLESv2.so",
+                "libvulkan.so.1",
+                "libvk_swiftshader.so",
+                "vk_swiftshader_icd.json",
+            ):
+                quelle = quelle_cef / name
+
+                if not quelle.is_file():
+                    raise FileNotFoundError(f"CEF: {quelle} fehlt")
+
+                shutil.copy2(quelle, ziel_cef / name)
+                print(f"CEF kopiert: {name}")
+
+            # ====================================================
+            # CEF - SPRACHDATEIEN
+            # ====================================================
+
+            quelle = quelle_cef / "locales"
+
+            if not quelle.is_dir():
+                raise FileNotFoundError(f"CEF: {quelle} fehlt")
+
+            shutil.copytree(
+                quelle,
+                ziel_cef / "locales",
+                dirs_exist_ok=True
+            )
+
+            print("CEF: Sprachdateien kopiert")
+
+        else:
+            print("Browser: Kopieren aus Kodi-Verzeichnis übersprungen")
+
+        # ====================================================
+        # BROWSER - SKIN INSTALLIEREN
+        # ====================================================
+
+        subprocess.run(
+            [
+                sys.executable,
+                str(BROWSER / "browser_k21_3_c150_skin.py"),
+                "-1"
+            ],
+            check=True
+        )
+
+        print("Browser: Installation abgeschlossen", flush=True)
 
         # ====================================================
         # HBBTV - NUR WENN pvr.hts VORHANDEN
