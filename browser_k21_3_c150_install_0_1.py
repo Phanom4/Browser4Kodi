@@ -1,230 +1,211 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import sys
-import os
 import time
 
 # ============================================================
-# Verzeichnisse
+# HEADER / VERZEICHNISSE / PFADE
 # ============================================================
 
 BASE = Path(__file__).resolve().parent
+KODI = Path.home() / ".kodi"
+BROWSER = KODI / "browser"
+INSTALLER_ADDON = KODI / "addons/script.browser.installer"
+PVR_HTS = KODI / "userdata/addon_data/pvr.hts"
 
-# Kodi-interne Schreibweise (spaeter innerhalb Kodis aufloesen):
-KODI_SPECIAL_PROFILE = "special://profile/"
-KODI_SPECIAL_ADDON_DATA = "special://profile/addon_data/"
-KODI_SPECIAL_PVR_HTS = "special://profile/addon_data/pvr.hts/"
+# Ausschliesslich diese Dateien verwaltet der zentrale Installer.
+PYTHON_DATEIEN = (
+    "browser_k21_3_c150_install_0_1.py",
+    "browser_k21_3_c150_load.py",
+    "browser_k21_3_c150_retroplayer.py",
+    "browser_k21_3_c150_skin.py",
+)
 
-# Vorlaeufiger Dateisystempfad fuer das externe Python-Programm.
-# 'special://' kann pathlib ausserhalb von Kodi nicht aufloesen.
-PROFILE = Path.home() / ".kodi"
-SKIN = PROFILE / "addons/skin.confluence/1080p"
-PVR_HTS = PROFILE / "userdata/addon_data/pvr.hts"
-HBBTV_DATABASE = PROFILE / "userdata/Database/HbbTV1.db"
-HBBTV_WINDOW = SKIN / "custom_HbbTVChannels.xml"
-BROWSER = PROFILE / "browser"
-INSTALLER_ADDON = PROFILE / "addons/script.browser.installer"
-HBBTV_ADDON = PROFILE / "addons/hbbtv-hts"
+# Schnittstellen der eigenstaendigen Programme.
+# Diese beiden install.py existieren im jetzigen GitHub-Stand NOCH NICHT.
+BROWSER_QUELLE = BASE / "addon/browser/install.py"
+BROWSER_INSTALLIERT = BROWSER / "components/browser/install.py"
+HBBTV_QUELLE = BASE / "addon/HBBTV/install.py"
+HBBTV_INSTALLIERT = KODI / "addons/hbbtv-hts/install.py"
 
+if len(sys.argv) != 2 or sys.argv[1] not in ("-0", "-1", "-rm"):
+    sys.exit("Verwendung: browser_k21_3_c150_install_0_1.py -1 | -0 | -rm")
 
-# ============================================================
-# Browser-Verzeichnis anlegen und Python-Dateien kopieren
-# ============================================================
-def install_browser():
-    BROWSER.mkdir(parents=True, exist_ok=True)
+OPTION = sys.argv[1]
 
-    if BASE != BROWSER:
-        for source in BASE.glob("browser_k21_3_c150+*.py"):
-            shutil.copy2(source, BROWSER / source.name)
+try:
+    # ========================================================
+    # DEINSTALLATION -0
+    # ========================================================
+    if OPTION == "-0":
+        print("Deinstallation gestartet", flush=True)
 
-        for old in BROWSER.glob("browser_k21_3_c150+*.py"):
-            if not (BASE / old.name).is_file():
-                old.unlink()
+        # ====================================================
+        # PROGRAMM 4 - KOMMT NOCH
+        # ====================================================
+        # Nur wenn installiert; eigene Deinstallation.
 
+        # ====================================================
+        # HBBTV
+        # ====================================================
+        programm = HBBTV_INSTALLIERT if HBBTV_INSTALLIERT.is_file() else HBBTV_QUELLE
+        if programm.is_file():
+            subprocess.run([sys.executable, str(programm), "-0"], check=True)
+        else:
+            print("HbbTV: kein eigener Installer vorhanden; uebersprungen")
 
-def remove_all():
-    subprocess.run(
-        [sys.executable, str(BASE / "browser_k21_3_c150_skin.py"), "-0"],
-        check=True
-    )
+        # ====================================================
+        # BROWSER
+        # ====================================================
+        programm = BROWSER_INSTALLIERT if BROWSER_INSTALLIERT.is_file() else BROWSER_QUELLE
+        if programm.is_file():
+            subprocess.run([sys.executable, str(programm), "-0"], check=True)
+        else:
+            print("Browser: kein eigener Installer vorhanden; uebersprungen")
 
-    uninstall_hbbtv()
-    uninstall_browser()
+        # ====================================================
+        # INSTALLER
+        # ====================================================
+        # Bei -0 bleibt er selbst vollstaendig erhalten.
+        print("Installer: bleibt erhalten")
 
-    if INSTALLER_ADDON.is_dir():
-        shutil.rmtree(INSTALLER_ADDON)
-     
-    if HBBTV_ADDON.is_dir():
-        shutil.rmtree(HBBTV_ADDON)
+    # ========================================================
+    # INSTALLATION -1
+    # ========================================================
+    elif OPTION == "-1":
+        print("Installation gestartet", flush=True)
 
-    if BROWSER.is_dir():
-        shutil.rmtree(BROWSER)
- 
-# ============================================================
-# Installer addon - immer
-# ============================================================
+        # Vor der Installation pruefen, ob die Programme vorhanden sind.
+        browser_programm = (BROWSER_QUELLE if BROWSER_QUELLE.is_file()
+                            else BROWSER_INSTALLIERT)
+        hbbtv_programm = (HBBTV_QUELLE if HBBTV_QUELLE.is_file()
+                          else HBBTV_INSTALLIERT)
+        if not browser_programm.is_file():
+            raise FileNotFoundError("Browser: eigenes Installationsprogramm fehlt")
+        if PVR_HTS.is_dir() and not hbbtv_programm.is_file():
+            raise FileNotFoundError("HbbTV: eigenes Installationsprogramm fehlt")
 
-def install_installer_addon():
-    source = BASE / "addon" / "installer"
+        # ====================================================
+        # INSTALLER
+        # ====================================================
+        # Nur seine vier Python-Dateien und sein Kodi-Add-on.
+        for name in PYTHON_DATEIEN:
+            if not (BASE / name).is_file():
+                raise FileNotFoundError(f"Installer-Datei fehlt: {BASE / name}")
 
-    if source.is_dir():
-        INSTALLER_ADDON.mkdir(parents=True, exist_ok=True)
+        addon_quelle = BASE / "addon/installer"
+        if addon_quelle.is_dir():
+            for name in ("addon.xml", "main.py"):
+                if not (addon_quelle / name).is_file():
+                    raise FileNotFoundError(f"Installer-Add-on-Datei fehlt: {name}")
+        elif not all((INSTALLER_ADDON / name).is_file()
+                     for name in ("addon.xml", "main.py")):
+            raise FileNotFoundError("Installer-Add-on-Quelldateien fehlen")
 
-        for name in ("addon.xml", "main.py"):
-            shutil.copy2(source / name, INSTALLER_ADDON / name)
+        BROWSER.mkdir(parents=True, exist_ok=True)
+        if BASE != BROWSER:
+            for name in PYTHON_DATEIEN:
+                shutil.copy2(BASE / name, BROWSER / name)
 
+        if addon_quelle.is_dir():
+            INSTALLER_ADDON.mkdir(parents=True, exist_ok=True)
+            for name in ("addon.xml", "main.py"):
+                shutil.copy2(addon_quelle / name, INSTALLER_ADDON / name)
+        print("Installer: Python-Dateien und Kodi-Add-on installiert")
 
-# ============================================================
-# Browser - immer
-# ============================================================
+        # ====================================================
+        # BROWSER
+        # ====================================================
+        # Browser holt seine Bibliotheken und Laufzeitdateien
+        # selbst und richtet seine eigenen Skin-Eintraege ein.
+        subprocess.run([sys.executable, str(browser_programm), "-1"], check=True)
+        print("Browser: eigene Installation abgeschlossen")
 
-def uninstall_browser():
-    # Der Menueintrag wird spaeter vom getrennten Skin-Programm entfernt.
-    print("Browser: Skin-Rueckbau folgt ueber das separate Skin-Programm")
+        # ====================================================
+        # HBBTV - NUR WENN pvr.hts VORHANDEN
+        # ====================================================
+        hbbtv_installiert = False
+        if PVR_HTS.is_dir():
+            subprocess.run([sys.executable, str(hbbtv_programm), "-1"], check=True)
+            hbbtv_installiert = True
+            print("HbbTV: eigene Installation abgeschlossen")
+        else:
+            print("HbbTV: pvr.hts fehlt; uebersprungen")
 
+        # ====================================================
+        # PROGRAMM 4 - KOMMT NOCH
+        # ====================================================
+        if hbbtv_installiert:
+            pass  # Erst einbinden, wenn das vierte Programm feststeht.
 
-# ============================================================
-# HBBTV addon - nur bei vorhandenem pvr.hts
-# ============================================================
+        print("Installation abgeschlossen")
 
-def hbbtv_available():
-    return PVR_HTS.is_dir()
+    # ========================================================
+    # VOLLSTAENDIG ENTFERNEN -rm
+    # ========================================================
+    elif OPTION == "-rm":
+        print("Vollstaendige Entfernung angefordert", flush=True)
 
+        # ====================================================
+        # WARTEN, BIS KODI GESCHLOSSEN IST
+        # ====================================================
+        if os.name == "nt":
+            while True:
+                status = subprocess.run(
+                    ["tasklist", "/FI", "IMAGENAME eq kodi.exe", "/FO", "CSV", "/NH"],
+                    capture_output=True, text=True, check=True,
+                )
+                if '"kodi.exe"' not in status.stdout.lower():
+                    break
+                time.sleep(1)
+        else:
+            while subprocess.run(
+                ["pgrep", "-x", "kodi.bin"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                check=False,
+            ).returncode == 0:
+                time.sleep(1)
 
-def find_hbbtv_window():
-    candidates = [
-        PROFILE / "addons/hbbtv-hts/custom_HbbTVChannels.xml",
-        BASE / "addon/HBBTV/custom_HbbTVChannels.xml",
-    ]
+        # ====================================================
+        # PROGRAMM 4 - KOMMT NOCH
+        # ====================================================
+        # Eigene Dateien und Ordner entfernen.
 
-    for source in candidates:
-        if source.is_file():
-            return source
+        # ====================================================
+        # HBBTV
+        # ====================================================
+        programm = HBBTV_INSTALLIERT if HBBTV_INSTALLIERT.is_file() else HBBTV_QUELLE
+        if programm.is_file():
+            subprocess.run([sys.executable, str(programm), "-rm"], check=True)
+        elif HBBTV_INSTALLIERT.parent.exists():
+            raise RuntimeError("HbbTV-Verzeichnis vorhanden, eigener Installer fehlt")
 
-    raise RuntimeError(
-        "HbbTV: custom_HbbTVChannels.xml nicht gefunden. "
-        "Bitte den urspruenglichen Add-on-Pfad eintragen."
-    )
+        # ====================================================
+        # BROWSER
+        # ====================================================
+        programm = BROWSER_INSTALLIERT if BROWSER_INSTALLIERT.is_file() else BROWSER_QUELLE
+        if programm.is_file():
+            subprocess.run([sys.executable, str(programm), "-rm"], check=True)
+        elif (BROWSER / "components/browser").exists():
+            raise RuntimeError("Browser-Komponente vorhanden, eigener Installer fehlt")
 
+        # ====================================================
+        # INSTALLER - IMMER ZULETZT
+        # ====================================================
+        # Der Kodi-Ordner 'browser' gehoert dieser Installation.
+        # Er wird erst nach erfolgreichem Rueckbau aller Komponenten geloescht.
+        if HBBTV_INSTALLIERT.parent.exists():
+            raise RuntimeError("HbbTV-Add-on ist nach -rm noch vorhanden")
+        if INSTALLER_ADDON.is_dir():
+            shutil.rmtree(INSTALLER_ADDON)
+        if BROWSER.is_dir():
+            shutil.rmtree(BROWSER)
+        print("Alle eigenen Installationsverzeichnisse entfernt")
 
-def install_hbbtv():
-    source = find_hbbtv_window()
-    shutil.copy2(source, HBBTV_WINDOW)
-    print("HbbTV: custom_HbbTVChannels.xml installiert")
-
-
-def uninstall_hbbtv():
-    if HBBTV_WINDOW.exists():
-        HBBTV_WINDOW.unlink()
-        print("HbbTV: custom_HbbTVChannels.xml entfernt")
-    else:
-        print("HbbTV: custom_HbbTVChannels.xml nicht vorhanden")
-
-    # Die selbst erzeugte Datenbank soll bei der Deinstallation mit weg.
-    if HBBTV_DATABASE.exists():
-        HBBTV_DATABASE.unlink()
-        print("HbbTV: HbbTV1.db entfernt")
-    else:
-        print("HbbTV: HbbTV1.db nicht vorhanden")
-
-
-# ============================================================
-# hbbtv-browser schnittstelle - spaeter
-# ============================================================
-
-
-
-
-# ============================================================
-# Installation
-# ============================================================
-
-def install():
-    print("browser_k21_3_c150: Installation gestartet")
-
-    install_browser()
-    
-    install_installer_addon()
-
-    if hbbtv_available():
-        print("HbbTV: pvr.hts erkannt")
-        install_hbbtv()
-
-        subprocess.run(
-            [sys.executable, str(BASE / "browser_k21_3_c150_skin.py"), "-1", "hbbtv"],
-            check=True
-        )
-    else:
-        print("HbbTV: pvr.hts fehlt - keine HbbTV-Installation")
-
-        subprocess.run(
-            [sys.executable, str(BASE / "browser_k21_3_c150_skin.py"), "-1"],
-            check=True
-        )
-
-    print("browser_k21_3_c150: Installation abgeschlossen")
-    
-# ============================================================
-# Deinstallation
-# ============================================================
-
-def uninstall():
-    print("browser_k21_3_c150: Deinstallation gestartet")
-
-    subprocess.run(
-        [sys.executable, str(BASE / "browser_k21_3_c150_skin.py"), "-0"],
-        check=True
-    )
-
-    uninstall_hbbtv()
-    uninstall_browser()
-
-    print("browser_k21_3_c150: Deinstallation abgeschlossen")
-
-# ============================================================
-# Auf Kodi-Ende warten (Linux / Windows)
-# ============================================================
-
-def kodi_running():
-    if os.name == "nt":
-        result = subprocess.run(
-            ["tasklist", "/FI", "IMAGENAME eq kodi.exe", "/FO", "CSV", "/NH"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        return '"kodi.exe"' in result.stdout.lower()
-
-    return subprocess.run(
-        ["pgrep", "-x", "kodi.bin"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    ).returncode == 0
-
-
-def wait_for_kodi():
-    while kodi_running():
-        time.sleep(1)
-            
-# ============================================================
-# Hauptprogramm
-# ============================================================
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("-1", "-0", "-rm"):
-        print("Verwendung: browser_k21_3_c150_install_0_1.py -1 | -0 | -rm")
-        sys.exit(1)
-
-    if sys.argv[1] == "-1":
-        install()
-
-    elif sys.argv[1] == "-0":
-        wait_for_kodi()
-        uninstall()
-
-    elif sys.argv[1] == "-rm":
-        wait_for_kodi()
-        remove_all()
+except (OSError, subprocess.CalledProcessError, RuntimeError) as fehler:
+    print(f"FEHLER: {fehler}", file=sys.stderr)
+    sys.exit(1)
