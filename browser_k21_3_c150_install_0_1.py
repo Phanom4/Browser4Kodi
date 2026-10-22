@@ -73,49 +73,61 @@ try:
         # Bei -0 bleibt er selbst vollstaendig erhalten.
         print("Installer: bleibt erhalten")
 
+
     # ========================================================
     # INSTALLATION -1
     # ========================================================
+
     elif OPTION == "-1":
         print("Installation gestartet", flush=True)
 
-        # Vor der Installation pruefen, ob die Programme vorhanden sind.
-        browser_programm = (BROWSER_QUELLE if BROWSER_QUELLE.is_file()
-                            else BROWSER_INSTALLIERT)
-        hbbtv_programm = (HBBTV_QUELLE if HBBTV_QUELLE.is_file()
-                          else HBBTV_INSTALLIERT)
-        if not browser_programm.is_file():
-            raise FileNotFoundError("Browser: eigenes Installationsprogramm fehlt")
-        if PVR_HTS.is_dir() and not hbbtv_programm.is_file():
-            raise FileNotFoundError("HbbTV: eigenes Installationsprogramm fehlt")
+        # ========================================================
+        # INSTALLER - GRUNDDATEIEN
+        # ========================================================
 
-        # ====================================================
-        # INSTALLER
-        # ====================================================
-        # Nur seine vier Python-Dateien und sein Kodi-Add-on.
-        for name in PYTHON_DATEIEN:
-            if not (BASE / name).is_file():
-                raise FileNotFoundError(f"Installer-Datei fehlt: {BASE / name}")
-
-        addon_quelle = BASE / "addon/installer"
-        if addon_quelle.is_dir():
-            for name in ("addon.xml", "main.py"):
-                if not (addon_quelle / name).is_file():
-                    raise FileNotFoundError(f"Installer-Add-on-Datei fehlt: {name}")
-        elif not all((INSTALLER_ADDON / name).is_file()
-                     for name in ("addon.xml", "main.py")):
-            raise FileNotFoundError("Installer-Add-on-Quelldateien fehlen")
-
-        BROWSER.mkdir(parents=True, exist_ok=True)
         if BASE != BROWSER:
-            for name in PYTHON_DATEIEN:
-                shutil.copy2(BASE / name, BROWSER / name)
+            BROWSER.mkdir(parents=True, exist_ok=True)
 
-        if addon_quelle.is_dir():
+            for name in PYTHON_DATEIEN:
+                quelle = BASE / name
+                ziel = BROWSER / name
+
+                if not quelle.is_file():
+                    raise FileNotFoundError(
+                        f"Installer: {quelle} fehlt"
+                    )
+
+                shutil.copy2(quelle, ziel)
+                print(f"Grunddatei kopiert: {name}")
+
+            print("Grunddateien kopiert", flush=True)
+
+        else:
+            print("Grunddateien bereits im Kodi-Verzeichnis", flush=True)
+
+
+        # ========================================================
+        # INSTALLER - ADDON
+        # ========================================================
+
+        if BASE != BROWSER:
+            quelle = BASE / "addon" / "installer"
+
+            if not quelle.is_dir():
+                raise FileNotFoundError(
+                    f"Installer-Add-on fehlt: {quelle}"
+                )
+
             INSTALLER_ADDON.mkdir(parents=True, exist_ok=True)
+
             for name in ("addon.xml", "main.py"):
-                shutil.copy2(addon_quelle / name, INSTALLER_ADDON / name)
-        print("Installer: Python-Dateien und Kodi-Add-on installiert")
+                shutil.copy2(
+                    quelle / name,
+                    INSTALLER_ADDON / name
+                )
+                print(f"Installer-Add-on kopiert: {name}")
+
+        print("Installer: Installation abgeschlossen", flush=True)
 
         # ====================================================
         # BROWSER
