@@ -6,7 +6,7 @@ mkdir Browser4Kodi
 cd Browser4Kodi 
 git clone https://github.com/Phanom4/Browser4Kodi.git .
 #install
-browser_k21_3_c150_install_0_1.py -1
+pyton browser_k21_3_c150_install_0_1.py -1
 
 # ======================
 # Version 2
@@ -56,5 +56,5 @@ python3 automate-git.py \
 cmake -S . -B build && cmake --build build -j 64
 
 #install
-browser_k21_3_c150_install_0_1.py -1
+pyton browser_k21_3_c150_install_0_1.py -1
 
