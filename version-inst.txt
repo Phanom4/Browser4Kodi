@@ -1,29 +1,39 @@
-version1
-Qellen
+# ======================
+# Version 1
+# ======================
+# Qellen
 mkdir Browser4Kodi
 cd Browser4Kodi 
 git clone https://github.com/Phanom4/Browser4Kodi.git .
+install
+browser_k21_3_c150_install_0_1.py -1
 
 
 
-
-Version2
-Qellen
+# ======================
+# Version 2
+# ======================
+# Qellen
 mkdir Browser4Kodi
 cd Browser4Kodi 
 git clone https://github.com/Phanom4/Browser4Kodi.git .
+rm ?
 
 
+install
+browser_k21_3_c150_install_0_1.py -1
 
 
-Version 3
-Bitte Beachten
-Download der Quellen: über 30 Minuten bei 100 mbits Telekom
-Kompilierung von CEF: über 40 Minuten bei 32 kerne 64 threads 64 gb Ram
-Kompilierung von Browser4Kodi: X Minuten bei 32 kerne 64 threads 64 gb Ram
-Betriebssystem Gentoo
+# ======================
+# Version 1
+# ======================
+# Bitte Beachten
+# Download der Quellen: über 30 Minuten bei 100 mbits Telekom
+# Kompilierung von CEF: über 40 Minuten bei 32 kerne 64 threads 64 gb Ram
+# Kompilierung von Browser4Kodi: X Minuten bei 32 kerne 64 threads 64 gb Ram
+# Betriebssystem Gentoo
 
-Qellen
+# Qellen
 mkdir Browser4Kodi
 cd Browser4Kodi 
 git clone https://github.com/Phanom4/Browser4Kodi.git .
@@ -48,7 +58,8 @@ Browser4Kodi
 
 cmake -S . -B build && cmake --build build -j 64
 
-
+install
+browser_k21_3_c150_install_0_1.py -1
 
 
 
