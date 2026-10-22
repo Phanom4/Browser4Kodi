@@ -97,6 +97,14 @@ set_target_properties(browser_k21_3_c150 PROPERTIES
 
 # CEF Chromium-Unterprozess
 
+# ============================================================
+# CEF Chromium-Unterprozess
+# ============================================================
+
+add_executable(browser_k21_3_c150_helper
+    "${BROWSER_K21_3_C150_DIR}/src/browser_k21_3_c150_helper.cpp"
+)
+
 target_compile_features(browser_k21_3_c150_helper PRIVATE cxx_std_17)
 
 target_compile_options(browser_k21_3_c150_helper PRIVATE

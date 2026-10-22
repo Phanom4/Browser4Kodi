@@ -181,6 +181,7 @@ try:
                 "libvulkan.so.1",
                 "libvk_swiftshader.so",
                 "vk_swiftshader_icd.json",
+                "v8_context_snapshot.bin",
             ):
                 quelle = quelle_cef / name
 
