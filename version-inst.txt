@@ -8,8 +8,6 @@ git clone https://github.com/Phanom4/Browser4Kodi.git .
 install
 browser_k21_3_c150_install_0_1.py -1
 
-
-
 # ======================
 # Version 2
 # ======================
@@ -22,7 +20,6 @@ rm ?
 
 install
 browser_k21_3_c150_install_0_1.py -1
-
 
 # ======================
 # Version 1
@@ -61,7 +58,3 @@ cmake -S . -B build && cmake --build build -j 64
 install
 browser_k21_3_c150_install_0_1.py -1
 
-
-
-ordner leeren 
-find /opt/git/browser_k21_3_c150/test -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
