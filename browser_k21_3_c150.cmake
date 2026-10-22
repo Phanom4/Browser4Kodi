@@ -86,16 +86,16 @@ target_link_libraries(browser_k21_3_c150 PRIVATE
     dl
 )
 
+
 set_target_properties(browser_k21_3_c150 PROPERTIES
     PREFIX ""
     OUTPUT_NAME "browser_k21_3_c150"
-    BUILD_RPATH "\$ORIGIN/../chromium/src/out/Release_GN_x64"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "\$ORIGIN/../cef"
 )
 
+
 # CEF Chromium-Unterprozess
-add_executable(browser_k21_3_c150_helper
-    "${BROWSER_K21_3_C150_DIR}/src/browser_k21_3_c150_helper.cpp"
-)
 
 target_compile_features(browser_k21_3_c150_helper PRIVATE cxx_std_17)
 
@@ -115,7 +115,8 @@ target_link_libraries(browser_k21_3_c150_helper PRIVATE
 )
 
 set_target_properties(browser_k21_3_c150_helper PROPERTIES
-    BUILD_RPATH "${CEF_ROOT}"
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "\$ORIGIN/../cef"
 )
 
 # CEF-BGRA direkt als Rawvideo-Stream für Kodi VideoPlayer
