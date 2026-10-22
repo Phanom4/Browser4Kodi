@@ -22,7 +22,7 @@ install
 browser_k21_3_c150_install_0_1.py -1
 
 # ======================
-# Version 1
+# Version 3
 # ======================
 # Bitte Beachten
 # Download der Quellen: über 30 Minuten bei 100 mbits Telekom
