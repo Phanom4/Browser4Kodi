@@ -263,8 +263,8 @@ try:
         # ====================================================
         # PROGRAMM 4 - KOMMT NOCH
         # ====================================================
-        if hbbtv_installiert:
-            pass  # Erst einbinden, wenn das vierte Programm feststeht.
+        #if hbbtv_installiert:
+         #   pass  # Erst einbinden, wenn das vierte Programm feststeht.
 
         print("Installation abgeschlossen")
 
@@ -274,94 +274,33 @@ try:
     elif OPTION == "-rm":
         print("Vollstaendige Entfernung angefordert", flush=True)
 
-        # ====================================================
-        # WARTEN, BIS KODI GESCHLOSSEN IST
-        # ====================================================
-        if os.name == "nt":
-            while True:
-                status = subprocess.run(
-                    ["tasklist", "/FI", "IMAGENAME eq kodi.exe", "/FO", "CSV", "/NH"],
-                    capture_output=True, text=True, check=True,
-                )
-                if '"kodi.exe"' not in status.stdout.lower():
-                    break
-                time.sleep(1)
-        else:
-            while subprocess.run(
-                ["pgrep", "-x", "kodi.bin"],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                check=False,
-            ).returncode == 0:
-                time.sleep(1)
+        # Zuerst deaktivieren
+        subprocess.run(
+            [sys.executable, str(Path(__file__).resolve()), "-0"],
+            check=True
+        )
 
-        # ====================================================
-        # PROGRAMM 4 - KOMMT NOCH
-        # ====================================================
-        
-    print("Vollstaendige instalation script durchgelaufen ", 
-        
-        
-        
-        # Eigene Dateien und Ordner entfernen.
+        # Löschskript nach Kodi/temp kopieren
+        quelle = BASE / "browser_clean.py"
+        ziel = KODI / "temp" / "browser_clean.py"
 
-        # ====================================================
-        # HBBTV
-        # ====================================================
-        programm = HBBTV_INSTALLIERT if HBBTV_INSTALLIERT.is_file() else HBBTV_QUELLE
-        if programm.is_file():
-            subprocess.run([sys.executable, str(programm), "-rm"], check=True)
-        elif HBBTV_INSTALLIERT.parent.exists():
-            raise RuntimeError("HbbTV-Verzeichnis vorhanden, eigener Installer fehlt")
+        shutil.copy2(quelle, ziel)
 
-        # ====================================================
-        # BROWSER
-        # ====================================================
-        programm = BROWSER_INSTALLIERT if BROWSER_INSTALLIERT.is_file() else BROWSER_QUELLE
-        if programm.is_file():
-            subprocess.run([sys.executable, str(programm), "-rm"], check=True)
-        elif (BROWSER / "components/browser").exists():
-            raise RuntimeError("Browser-Komponente vorhanden, eigener Installer fehlt")
+        # Unabhängig starten
+        subprocess.Popen(
+            [sys.executable, str(ziel)],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=(os.name != "nt"),
+            creationflags=(
+                subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+                if os.name == "nt" else 0
+            )
+        )
 
-        # ====================================================
-        # INSTALLER - IMMER ZULETZT
-        # ====================================================
-        # Der Kodi-Ordner 'browser' gehoert dieser Installation.
-        # Er wird erst nach erfolgreichem Rueckbau aller Komponenten geloescht.
-        if HBBTV_INSTALLIERT.parent.exists():
-            raise RuntimeError("HbbTV-Add-on ist nach -rm noch vorhanden")
-        if INSTALLER_ADDON.is_dir():
-            shutil.rmtree(INSTALLER_ADDON)
-        if BROWSER.is_dir():
-            shutil.rmtree(BROWSER)
-        print("Alle eigenen Installationsverzeichnisse entfernt")
+        print("Browser: Entfernung gestartet", flush=True)
 
 except (OSError, subprocess.CalledProcessError, RuntimeError) as fehler:
     print(f"FEHLER: {fehler}", file=sys.stderr)
     sys.exit(1)
-    
-import tempfile
-
-# Zuerst deaktivieren (-0).
-subprocess.run(
-    [sys.executable, str(Path(__file__).resolve()), "-0"],
-    check=True
-)
-
-# Externes Löschskript ins Temp-Verzeichnis kopieren.
-quelle = BASE / "browser_k21_3_c150_rm.py"
-ziel = Path(tempfile.mkdtemp(prefix="browser4kodi_rm_")) / quelle.name
-
-shutil.copy2(quelle, ziel)
-
-# Unabhängig von Kodi starten.
-subprocess.Popen(
-    [sys.executable, str(ziel)],
-    stdin=subprocess.DEVNULL,
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL,
-    start_new_session=(os.name != "nt"),
-    creationflags=(
-        subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
-        if os.name == "nt" else 0
-    )
-)
