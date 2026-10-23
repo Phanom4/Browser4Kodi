@@ -297,6 +297,11 @@ try:
         # ====================================================
         # PROGRAMM 4 - KOMMT NOCH
         # ====================================================
+        
+    print("Vollstaendige instalation script durchgelaufen ", 
+        
+        
+        
         # Eigene Dateien und Ordner entfernen.
 
         # ====================================================

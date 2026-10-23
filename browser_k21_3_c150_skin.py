@@ -436,7 +436,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-    import xbmc
-    xbmc.executebuiltin("ReloadSkin()")
-except ModuleNotFoundError:
-    pass
+        import xbmc
+        xbmc.executebuiltin("ReloadSkin()")
+    except ModuleNotFoundError:
+        pass
