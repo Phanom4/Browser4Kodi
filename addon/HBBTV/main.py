@@ -604,7 +604,9 @@ addon_path = xbmcvfs.translatePath(
 
 window = HbbTVWindow(
     XML_FILE,
-    addon_path
+    addon_path,
+    "Default",
+    "1080i"
 )
 
 window.doModal()
