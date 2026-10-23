@@ -6,6 +6,8 @@ import time
 import shutil
 from pathlib import Path
 
+os.chdir(Path(__file__).resolve().parent)
+
 # Warten, bis Kodi beendet ist.
 while True:
     if os.name == "nt":
@@ -26,7 +28,10 @@ while True:
     time.sleep(1)
 
 # Ab hier deine drei, später vier Löschbefehle:
-# shutil.rmtree(PFAD_1)
-# shutil.rmtree(PFAD_2)
+ shutil.rmtree ../browser
+ shutil.rmtree ../addons/script.browser.installer
 # shutil.rmtree(PFAD_3)
 # shutil.rmtree(PFAD_4)
+Path(__file__).unlink()
+
+Path(__file__).unlink()
