@@ -1,22 +1,3 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# CMake
-build/
-cmake-build-*/
-CMakeFiles/
-CMakeCache.txt
-
-# Compiler
-*.o
-*.a
-*.so
-*.so.*
-
-# Logs
-*.log
-
-# Lokale Arbeits- und Testumgebung
 /test/
+/version_*/
+/chromium/src/out/Release_GN_x64/libcef.so

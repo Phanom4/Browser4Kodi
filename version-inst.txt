@@ -28,10 +28,14 @@ python browser_k21_3_c150_install_0_1.py -1
 # Version 3
 # ======================
 # Bitte Beachten
+# 50 Gb festplattenspeicher
 # Download der Quellen: über 30 Minuten bei 100 mbits Telekom
 # Kompilierung von CEF: über 40 Minuten bei 32 kerne 64 threads 64 gb Ram
 # Kompilierung von Browser4Kodi: X Minuten bei 32 kerne 64 threads 64 gb Ram
 # Betriebssystem Gentoo
+
+
+#ls -lh /opt/git/browser_k21_3_c150/test/Browser4Kodi/chromium/src/third_party/llvm-build/Release+Asserts/bin/{ld,ld.lld,lld} 2>/dev/null
 
 # Qellen
 wget -O Browser4Kodi-test.zip \
@@ -60,4 +64,6 @@ cmake -S . -B build && cmake --build build -j 64
 
 #install
 python browser_k21_3_c150_install_0_1.py -1
+
+#ls -lh /opt/git/browser_k21_3_c150/test/Browser4Kodi/chromium/src/third_party/llvm-build/Release+Asserts/bin/{ld,ld.lld,lld} 2>/dev/null
 
