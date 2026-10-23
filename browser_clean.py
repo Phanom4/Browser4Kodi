@@ -18,7 +18,7 @@ while True:
         laeuft = '"kodi.exe"' in status.stdout.lower()
     else:
         laeuft = subprocess.run(
-            ["pgrep", "-x", "kodi.bin"],
+            ["pgrep", "-x", "kodi.*"],
             stdout=subprocess.DEVNULL
         ).returncode == 0
 
@@ -27,11 +27,10 @@ while True:
 
     time.sleep(1)
 
-# Ab hier deine drei, später vier Löschbefehle:
- shutil.rmtree ../browser
- shutil.rmtree ../addons/script.browser.installer
+# Löschbefehle:
+shutil.rmtree("../browser")
+shutil.rmtree("../addons/script.browser.installer")
 # shutil.rmtree(PFAD_3)
 # shutil.rmtree(PFAD_4)
-Path(__file__).unlink()
 
 Path(__file__).unlink()
