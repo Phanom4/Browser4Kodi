@@ -23,6 +23,7 @@ PYTHON_DATEIEN = (
     "browser_k21_3_c150_load.py",
     "browser_k21_3_c150_retroplayer.py",
     "browser_k21_3_c150_skin.py",
+    "browser_clean.py",
 )
 
 # Schnittstellen der eigenstaendigen Programme.
@@ -225,17 +226,39 @@ try:
         )
 
         print("Browser: Installation abgeschlossen", flush=True)
-
+        
         # ====================================================
         # HBBTV - NUR WENN pvr.hts VORHANDEN
         # ====================================================
-        hbbtv_installiert = False
-        if PVR_HTS.is_dir():
-            subprocess.run([sys.executable, str(hbbtv_programm), "-1"], check=True)
-            hbbtv_installiert = True
-            print("HbbTV: eigene Installation abgeschlossen")
-        else:
-            print("HbbTV: pvr.hts fehlt; uebersprungen")
+        if (PVR_HTS / "instance-settings-1.xml").is_file():
+
+            if BASE != BROWSER:
+                shutil.copytree(
+                    BASE / "addon" / "HBBTV",
+                    BROWSER / "addon" / "HBBTV",
+                    dirs_exist_ok=True
+                )
+
+            # Add-on immer installieren
+            shutil.copytree(
+                BROWSER / "addon" / "HBBTV",
+                KODI / "addons" / "hbbtv-hts",
+                dirs_exist_ok=True
+            )
+
+            # Skin immer installieren
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(BROWSER / "browser_k21_3_c150_skin.py"),
+                    "-1", "hbbtv"
+                ],
+                check=True
+            )
+
+            if BASE == BROWSER:
+                import xbmc
+                xbmc.executebuiltin("UpdateLocalAddons")
 
         # ====================================================
         # PROGRAMM 4 - KOMMT NOCH

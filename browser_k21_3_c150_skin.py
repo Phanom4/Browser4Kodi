@@ -424,13 +424,7 @@ def uninstall_skin(skin):
 
     print("browser_k21_3_c150: Skin-Deinstallation abgeschlossen")
 
-# ============================================================
-# Hauptprogramm
-# ============================================================
-
 if __name__ == "__main__":
-    # -1: Browser immer; HbbTV ausschliesslich, wenn vom Installer gewaehlt.
-    # -0: Eingefuegte Skin-Aenderungen entfernen.
     if sys.argv[1:] == ["-1"]:
         install_skin(SKIN, with_hbbtv=False)
     elif sys.argv[1:] == ["-1", "hbbtv"]:
@@ -440,3 +434,9 @@ if __name__ == "__main__":
     else:
         print("Verwendung: browser_k21_3_c150_skin.py -1 [hbbtv] | -0")
         sys.exit(1)
+
+    try:
+    import xbmc
+    xbmc.executebuiltin("ReloadSkin()")
+except ModuleNotFoundError:
+    pass
