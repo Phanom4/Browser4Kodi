@@ -310,3 +310,30 @@ try:
 except (OSError, subprocess.CalledProcessError, RuntimeError) as fehler:
     print(f"FEHLER: {fehler}", file=sys.stderr)
     sys.exit(1)
+    
+import tempfile
+
+# Zuerst deaktivieren (-0).
+subprocess.run(
+    [sys.executable, str(Path(__file__).resolve()), "-0"],
+    check=True
+)
+
+# Externes Löschskript ins Temp-Verzeichnis kopieren.
+quelle = BASE / "browser_k21_3_c150_rm.py"
+ziel = Path(tempfile.mkdtemp(prefix="browser4kodi_rm_")) / quelle.name
+
+shutil.copy2(quelle, ziel)
+
+# Unabhängig von Kodi starten.
+subprocess.Popen(
+    [sys.executable, str(ziel)],
+    stdin=subprocess.DEVNULL,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+    start_new_session=(os.name != "nt"),
+    creationflags=(
+        subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+        if os.name == "nt" else 0
+    )
+)
