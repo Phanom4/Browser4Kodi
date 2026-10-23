@@ -122,6 +122,10 @@ Dabei steht `-1` für Installation, `-0` für Deinstallation und `-rm`
 für vollständiges Entfernen. Diese Optionen sind **keine Auswahl der drei
 Build-Varianten**.
 
+Hinweis zur Deinstallation
+Wurde Browser4Kodi während der aktuellen Kodi-Sitzung bereits gestartet, können Browser- und CEF-Bibliotheken noch geladen sein.
+Die vollständige Deinstallation beziehungsweise Entfernung wird deshalb gegebenenfalls erst nach dem Beenden und erneuten Starten von Kodi wirksam.
+
 Der Installer richtet bereits Teile der Python-/Kodi-Einbindung, des
 Browser-Installer-Add-ons und der Skin-Integration ein. Die vollständige
 Bereitstellung aller Browser- und CEF-Laufzeitdateien ist noch in Arbeit.
