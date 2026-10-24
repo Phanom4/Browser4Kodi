@@ -4,7 +4,7 @@ Browser4Kodi ist ein in Entwicklung befindlicher Browser für Kodi auf Basis des
 Chromium Embedded Framework (CEF). Die Browserdarstellung wird in Kodi
 eingebunden; ein Neubau des Kodi-Hauptprogramms ist dafür nicht vorgesehen.
 
-Die Projektbezeichnung `browser_k21_3_c150` steht für die Zielkombination
+Die Projektbezeichnung `browser` steht für die Zielkombination
 Kodi 21.3 (Omega) und CEF/Chromium 150.
 
 **Status:** Entwicklungsprojekt. Noch keine fertige, allgemein nutzbare
@@ -110,12 +110,12 @@ für den Browser. Die drei oben beschriebenen Installationsvarianten sind aber
 noch nicht als vollständig automatisierte Auswahl implementiert.
 
 Der vorhandene Installer heißt
-`browser_k21_3_c150_install_0_1.py` und kennt folgende Aufrufe:
+`browser_install_0_1.py` und kennt folgende Aufrufe:
 
 ```bash
-python3 browser_k21_3_c150_install_0_1.py -1
-python3 browser_k21_3_c150_install_0_1.py -0
-python3 browser_k21_3_c150_install_0_1.py -rm
+python3 browser_install_0_1.py -1
+python3 browser_install_0_1.py -0
+python3 browser_install_0_1.py -rm
 ```
 
 Dabei steht `-1` für Installation, `-0` für Deinstallation und `-rm`
@@ -139,10 +139,10 @@ Diese externen Voraussetzungen müssen derzeit selbst bereitgestellt werden.
 ## Projektaufbau
 
 - `src/` – C++-Quellcode des Browsers, CEF-Einbindung und Hilfsprogramm
-- `browser_k21_3_c150.cmake` und `CMakeLists.txt` – Browser-Build
-- `browser_k21_3_c150_install_0_1.py` – zentraler Installer
-- `browser_k21_3_c150_skin.py` – Kodi-Skin-Integration
-- `browser_k21_3_c150_load.py` – Browserstart und laufende CEF-Steuerung
+- `browser.cmake` und `CMakeLists.txt` – Browser-Build
+- `browser_install_0_1.py` – zentraler Installer
+- `browser_skin.py` – Kodi-Skin-Integration
+- `browser_load.py` – Browserstart und laufende CEF-Steuerung
 - `addon/installer/` – Installer-Add-on für Kodi
 - `addon/HBBTV/` – zusätzliche HbbTV-Integration
 
