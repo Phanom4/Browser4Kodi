@@ -7,7 +7,9 @@ wget -O Browser4Kodi-test.zip \
 unzip  Browser4Kodi-test.zip
 cd Browser4Kodi 
 #install
-python browser_install_0_1.py -1
+#python browser_install_0_1.py -1
+python browser_k21_3_c150_install_0_1.py -1
+
 
 # ======================
 # Version 2
