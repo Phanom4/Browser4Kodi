@@ -2,9 +2,9 @@
 # Version 1
 # ======================
 # Qellen
-wget -O Browser4Kodi-test.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.1-test/Browser4Kodi-test.zip
-unzip  Browser4Kodi-test.zip
+wget -O Browser4Kodi-addon.zip \
+  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
+unzip  Browser4Kodi-addon.zip
 cd Browser4Kodi 
 #install
 #python browser_install_0_1.py -1
@@ -15,9 +15,9 @@ python browser_k21_3_c150_install_0_1.py -1
 # Version 2
 # ======================
 # Qellen
-wget -O Browser4Kodi-test.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.1-test/Browser4Kodi-test.zip
-unzip  Browser4Kodi-test.zip
+wget -O Browser4Kodi-addon.zip \
+  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
+unzip  Browser4Kodi-addon.zip
 cd Browser4Kodi/k21_3_c150
 rm -rf build
 #Browser4Kodi
@@ -34,9 +34,9 @@ cmake -S . -B build && cmake --build build -j 64
 # Betriebssystem Gentoo
 
 # Qellen
-wget -O Browser4Kodi-test.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.1-test/Browser4Kodi-test.zip
-unzip  Browser4Kodi-test.zip
+wget -O Browser4Kodi-addon.zip \
+  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
+unzip  Browser4Kodi-addon.zip
 cd Browser4Kodi/k21_3_c150 
 rm -rf cef chromium build depot_tools 
 git clone --branch 7871 --single-branch https://github.com/chromiumembedded/cef.git cef

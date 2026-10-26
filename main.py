@@ -483,26 +483,6 @@ class HbbTVWindow(xbmcgui.WindowXML):
             xbmc.LOGINFO
         )
 
-        # ---------------------------------------------------------
-        # ALTER IFO-TEST - bleibt erhalten, derzeit deaktiviert
-        # ---------------------------------------------------------
-        #
-        # Hier wird später für den gewählten Sender/App-Link
-        # die VIDEO_TS.IFO neu erstellt.
-        #
-        # create_hbbtv_ifo(...)
-        #
-        # TEST: vorhandene feste VIDEO_TS.IFO öffnen
-        #
-        # ifo_path = xbmcvfs.translatePath(
-        #     "special://home/addons/hbbtv-hts/hbbtv-dvd/VIDEO_TS.IFO"
-        # )
-        #
-        # xbmc.log(
-        #     f"HbbTV: Ebene 3 TEST - öffne VIDEO_TS.IFO: {ifo_path}",
-        #     xbmc.LOGINFO
-        # )
-        #
         # xbmc.Player().play(ifo_path)
     def go_back(self):
         if len(self.history) <= 1:
@@ -599,7 +579,7 @@ class HbbTVWindow(xbmcgui.WindowXML):
 
 
 addon_path = xbmcvfs.translatePath(
-    "special://home/addons/hbbtv-hts"
+    "special://home/addons/browser4kodi"
 )
 
 window = HbbTVWindow(

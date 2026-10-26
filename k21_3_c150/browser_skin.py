@@ -32,7 +32,7 @@ BROWSER_ITEM = '''\
 					<!-- browser START -->
 					<item id="33033">
 						<label>Browser</label>
-						<onclick>RunScript(special://home/browser/browser_load.py)</onclick>
+						<onclick>RunScript(special://home/addons/browser4kodi/k21_3_c150/browser_load.py)</onclick>
 						<icon />
 						<thumb />
 					</item>
