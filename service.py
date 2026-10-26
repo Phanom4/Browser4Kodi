@@ -33,6 +33,7 @@ if pending_file.is_file():
                 "Browser4Kodi: Skin-Installation erfolgreich",
                 xbmc.LOGINFO
             )
+            xbmc.executebuiltin("ReloadSkin()")
 
             # Erst nach erfolgreichem Test aktivieren:
             # pending_file.unlink()
