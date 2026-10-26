@@ -17,6 +17,25 @@ xbmc.log(
 addon_dir = Path(__file__).resolve().parent
 pending_file = addon_dir / "install.pending"
 skin_script = addon_dir / "k21_3_c150" / "browser_skin.py"
+# Browser4Kodi: Ausführungsrecht für CEF-Unterprozess sicherstellen
+browser_helper = addon_dir / "k21_3_c150" / "build" / "browser_helper"
+
+try:
+    if browser_helper.is_file():
+        mode = browser_helper.stat().st_mode
+
+        if not mode & 0o111:
+            browser_helper.chmod(mode | 0o111)
+            xbmc.log(
+                "Browser4Kodi: browser_helper ausführbar gemacht",
+                xbmc.LOGINFO
+            )
+
+except OSError as e:
+    xbmc.log(
+        f"Browser4Kodi: browser_helper Berechtigungsfehler: {e}",
+        xbmc.LOGERROR
+    )
 
 if pending_file.is_file():
     xbmc.log("Browser4Kodi: install.pending gefunden", xbmc.LOGINFO)
