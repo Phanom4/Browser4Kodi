@@ -21,9 +21,6 @@ rm -rf build
 #Browser4Kodi
 cmake -S . -B build && cmake --build build -j 64
 
-#install
-python browser_install_0_1.py -1
-
 # ======================
 # Version 3
 # ======================
@@ -34,15 +31,12 @@ python browser_install_0_1.py -1
 # Kompilierung von Browser4Kodi: X Minuten bei 32 kerne 64 threads 64 gb Ram
 # Betriebssystem Gentoo
 
-
-#ls -lh /opt/git/browser_k21_3_c150/test/Browser4Kodi/chromium/src/third_party/llvm-build/Release+Asserts/bin/{ld,ld.lld,lld} 2>/dev/null
-
 # Qellen
 wget -O Browser4Kodi-test.zip \
   https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.1-test/Browser4Kodi-test.zip
 unzip  Browser4Kodi-test.zip
 cd Browser4Kodi/k21_3_c150 
-rm -rf cef chromium build
+rm -rf cef chromium build depot_tools 
 git clone --branch 7871 --single-branch https://github.com/chromiumembedded/cef.git cef
 wget https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automate/automate-git.py
 sed -i "s/sync_args = '--nohooks '/sync_args = '--nohooks --jobs=1 '/" automate-git.py
@@ -62,8 +56,4 @@ python3 automate-git.py \
 #Browser4Kodi
 cmake -S . -B build && cmake --build build -j 64
 
-#install
-python browser_install_0_1.py -1
-
-#ls -lh /opt/git/browser_k21_3_c150/test/Browser4Kodi/chromium/src/third_party/llvm-build/Release+Asserts/bin/{ld,ld.lld,lld} 2>/dev/null
 
