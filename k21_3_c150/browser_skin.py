@@ -438,5 +438,6 @@ if __name__ == "__main__":
     try:
         import xbmc
         xbmc.executebuiltin("ReloadSkin()")
+        if result.returncode == 0:
     except ModuleNotFoundError:
         pass
