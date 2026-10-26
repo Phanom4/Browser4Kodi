@@ -604,7 +604,7 @@ void OwnerThread()
 
     const fs::path base =
         fs::absolute(info.dli_fname).parent_path().parent_path();
-    const fs::path cef = base / "cef";
+    const fs::path cef = base / "chromium/src/out/Release_GN_x64";
     const fs::path build = base / "build";
 
     char processName[] = "browser";
