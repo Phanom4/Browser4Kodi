@@ -91,7 +91,7 @@ set_target_properties(browser PROPERTIES
     PREFIX ""
     OUTPUT_NAME "browser"
     BUILD_WITH_INSTALL_RPATH TRUE
-    INSTALL_RPATH "\$ORIGIN/../cef"
+    INSTALL_RPATH "$ORIGIN/../chromium/src/out/Release_GN_x64"
 )
 
 
@@ -124,7 +124,7 @@ target_link_libraries(browser_helper PRIVATE
 
 set_target_properties(browser_helper PROPERTIES
     BUILD_WITH_INSTALL_RPATH TRUE
-    INSTALL_RPATH "\$ORIGIN/cef"
+    INSTALL_RPATH "$ORIGIN/../chromium/src/out/Release_GN_x64"
 )
 
 # CEF-BGRA direkt als Rawvideo-Stream für Kodi VideoPlayer
