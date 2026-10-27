@@ -708,6 +708,14 @@ void browser_key_event(int pressed, int vkey, int native,
                 new KeyTask(pressed, vkey, native, unicode, kodiModifiers));
 }
 
+void browser_open_url()
+{
+    if (!g_initialized || !g_contextReady)
+        return;
+
+    PostCommand(Command::Open);
+}
+
 void browser_navigation(int action)
 {
     if (action < 1 || action > 3)

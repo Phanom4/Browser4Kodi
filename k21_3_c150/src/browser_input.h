@@ -27,6 +27,7 @@ void browser_mouse_wheel(int x, int y, int deltaX, int deltaY);
 void browser_key_event(int pressed, int vkey, int native, unsigned int unicode,
                              unsigned int kodiModifiers);
 void browser_navigation(int action);
+void browser_open_url();
 }
 
 namespace browser21input {
@@ -135,6 +136,10 @@ CServiceBroker::GetWinSystem()->ShowOSMouse(true);
         case browser21osd::Action::Reload:
             browser_navigation(3);
             break;
+        case browser21osd::Action::UrlSubmitted:
+            browser_open_url();
+            break;
+
         case browser21osd::Action::Exit:
             CServiceBroker::GetGUI()
                ->GetWindowManager()
