@@ -12,6 +12,7 @@
 #include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 #include <string>
 #include <system_error>
 
@@ -19,7 +20,17 @@ namespace browser21osd
 {
 namespace
 {
+const std::filesystem::path& HomepageFile();
+
 std::atomic<StartMode> g_startMode{StartMode::Home};
+std::once_flag g_startModeInit;
+
+const std::filesystem::path& StartModeFile()
+{
+    static const auto path =
+        HomepageFile().parent_path() / "startmode.txt";
+    return path;
+}
 
 // Startseite im Kodi-Benutzerprofil speichern.
 const std::filesystem::path& HomepageFile()
@@ -84,12 +95,40 @@ std::string GetHomepage()
 
 StartMode GetStartMode()
 {
+    std::call_once(g_startModeInit, [] {
+        std::ifstream file(StartModeFile());
+        std::string value;
+
+        if (file >> value)
+        {
+            if (value == "last")
+                g_startMode.store(StartMode::LastPage);
+        }
+        else
+        {
+            std::ofstream output(StartModeFile());
+            if (output)
+                output << "home\n";
+        }
+    });
+
     return g_startMode.load();
 }
 
 void SetStartMode(StartMode mode)
 {
-    g_startMode.store(mode);
+    GetStartMode();
+
+    std::ofstream file(StartModeFile(), std::ios::trunc);
+
+    if (!file)
+        return;
+
+    file << (mode == StartMode::LastPage ? "last" : "home")
+         << "\n";
+
+    if (file.good())
+        g_startMode.store(mode);
 }
 
 Action Show()

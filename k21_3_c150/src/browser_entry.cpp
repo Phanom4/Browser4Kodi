@@ -2,6 +2,7 @@
 #include "browser_url.h"
 #include "browser_osd.h"
 
+#include <sqlite3.h>
 #include "include/cef_command_line.h"
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
@@ -275,6 +276,65 @@ private:
     IMPLEMENT_REFCOUNTING(SimpleClient);
 };
 
+// Letzte besuchte URL aus der Chromium-History lesen.
+// Keine Änderung an der History und keine Verlauf-Rekonstruktion.
+std::string LastHistoryUrl()
+{
+    namespace fs = std::filesystem;
+
+    Dl_info info{};
+
+    if (!dladdr(reinterpret_cast<void*>(&LastHistoryUrl), &info) ||
+        !info.dli_fname)
+        return {};
+
+    const fs::path base =
+        fs::absolute(info.dli_fname).parent_path().parent_path();
+
+    const fs::path history = base / "cache/Default/History";
+
+    sqlite3* db = nullptr;
+
+    if (sqlite3_open_v2(
+            history.string().c_str(),
+            &db,
+            SQLITE_OPEN_READONLY,
+            nullptr) != SQLITE_OK)
+    {
+        if (db)
+            sqlite3_close(db);
+        return {};
+    }
+
+    sqlite3_busy_timeout(db, 1000);
+
+    const char* sql =
+        "SELECT url FROM urls "
+        "WHERE last_visit_time > 0 "
+        "ORDER BY last_visit_time DESC LIMIT 1";
+
+    sqlite3_stmt* statement = nullptr;
+    std::string url;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &statement, nullptr)
+        == SQLITE_OK)
+    {
+        if (sqlite3_step(statement) == SQLITE_ROW)
+        {
+            const auto* value = sqlite3_column_text(statement, 0);
+
+            if (value)
+                url = reinterpret_cast<const char*>(value);
+        }
+    }
+
+    if (statement)
+        sqlite3_finalize(statement);
+
+    sqlite3_close(db);
+    return url;
+}
+
 enum class Command
 {
     Open,
@@ -292,13 +352,26 @@ void ExecuteCommand(Command command)
             return;
     }
 
-    // Zentrale URL-Verwaltung:
-    // Übergebene URL hat Vorrang.
-    // Ohne Übergabe wird die Standard-URL verwendet.
     std::string url;
+    const bool hasPending = browser21url::TakePending(url);
 
-    if (!browser21url::TakePending(url))
-        url = browser21osd::GetHomepage();
+    if (!hasPending)
+    {
+        const auto mode = browser21osd::GetStartMode();
+
+        if (mode == browser21osd::StartMode::LastPage)
+        {
+            // Laufenden Browser unverändert weiterverwenden.
+            if (g_browser)
+                return;
+
+            // Nur beim erstmaligen Erzeugen aus History lesen.
+            url = LastHistoryUrl();
+        }
+
+        if (url.empty())
+            url = browser21osd::GetHomepage();
+    }
 
     // Vorhandenen CEF-Browser wiederverwenden.
     if (g_browser)
@@ -768,8 +841,6 @@ const char* browser_version()
 // bestehende CEF-Instanz verwenden, Standard-URL laden.
 void browser_open_default()
 {
-    browser21url::Submit(browser21osd::GetHomepage());
-
     if (!g_initialized || !g_contextReady)
         return;
 

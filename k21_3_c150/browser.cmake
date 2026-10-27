@@ -84,6 +84,7 @@ target_link_libraries(browser PRIVATE
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
+    sqlite3
 )
 
 
@@ -120,6 +121,7 @@ target_link_libraries(browser_helper PRIVATE
     "${CEF_ROOT}/libcef.so"
     pthread
     dl
+    sqlite3
 )
 
 set_target_properties(browser_helper PROPERTIES
