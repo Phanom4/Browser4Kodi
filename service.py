@@ -1,5 +1,8 @@
 import xbmc
 import subprocess
+import shutil
+import xbmcaddon
+import xbmcvfs
 import sys
 from pathlib import Path
 
@@ -67,6 +70,53 @@ if pending_file.is_file():
             f"Browser4Kodi: Fehler bei Skin-Installation: {e}",
             xbmc.LOGERROR
         )
+
+
+# Browser4Kodi Helper installieren oder aktivieren
+def ensure_helper():
+    addon_id = "browser4kodi.helper"
+
+    try:
+        xbmcaddon.Addon(id=addon_id)
+        xbmc.log("Browser4Kodi: Helper vorhanden", xbmc.LOGINFO)
+        xbmc.executebuiltin(f"EnableAddon({addon_id})")
+        return
+    except RuntimeError:
+        pass
+
+    source = addon_dir / "plus" / addon_id
+    destination = (
+        Path(xbmcvfs.translatePath("special://home/addons"))
+        / addon_id
+    )
+
+    if not (source / "addon.xml").is_file():
+        xbmc.log(
+            "Browser4Kodi: Helper-Quelldateien fehlen",
+            xbmc.LOGERROR
+        )
+        return
+
+    try:
+        if not destination.exists():
+            shutil.copytree(source, destination)
+
+        xbmc.log(
+            "Browser4Kodi: Helper-Dateien installiert",
+            xbmc.LOGINFO
+        )
+
+        xbmc.executebuiltin("UpdateLocalAddons")
+        xbmc.executebuiltin(f"EnableAddon({addon_id})")
+
+    except Exception as e:
+        xbmc.log(
+            f"Browser4Kodi: Helper-Installation fehlgeschlagen: {e}",
+            xbmc.LOGERROR
+        )
+
+
+ensure_helper()
 
 # Service aktiv halten
 while not monitor.abortRequested():
