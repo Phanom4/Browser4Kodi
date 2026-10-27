@@ -1,3 +1,11 @@
+Browser4Kodi Helper
+
+Dieses Add-on ist eine erforderliche Komponente von Browser4Kodi und übernimmt die Skin-Verwaltung sowie die Deinstallation zugehöriger Erweiterungen.
+
+Der Helper sollte nicht manuell deinstalliert werden, da Browser4Kodi ihn beim nächsten Start automatisch wieder installiert.
+
+Die vollständige Deinstallation erfolgt über Browser4Kodi.
+
 # ======================
 # Version 1
 # ======================

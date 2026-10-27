@@ -3,7 +3,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from resources.lib import htsp_hbbtv
 
 
 monitor = xbmc.Monitor()
@@ -42,7 +41,7 @@ if pending_file.is_file():
 
     try:
         result = subprocess.run(
-            [sys.executable, str(skin_script), "-1"],
+            [sys.executable, str(skin_script)],
             capture_output=True,
             text=True
         )
@@ -68,21 +67,6 @@ if pending_file.is_file():
             f"Browser4Kodi: Fehler bei Skin-Installation: {e}",
             xbmc.LOGERROR
         )
-
-# HbbTV1.db einmal beim Kodi-Start aktualisieren
-try:
-    htsp_hbbtv.main()
-
-    xbmc.log(
-        "HbbTV: HbbTV1.db beim Kodi-Start aktualisiert",
-        xbmc.LOGINFO
-    )
-
-except Exception as e:
-    xbmc.log(
-        f"HbbTV: Fehler beim Aktualisieren von HbbTV1.db: {e}",
-        xbmc.LOGERROR
-    )
 
 # Service aktiv halten
 while not monitor.abortRequested():

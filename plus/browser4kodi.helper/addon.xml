@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="browser4kodi.helper"
+       name="Browser4Kodi Helper"
+       version="0.1.0"
+       provider-name="Phanom4">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+
+    <extension point="xbmc.service"
+               library="service.py"
+               start="startup"/>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="de_DE">Verwaltung für Browser4Kodi</summary>
+        <description lang="de_DE">Pflichtkomponente von Browser4Kodi. Verwaltet Skin-Anpassungen und die Deinstallation der Browser4Kodi-Erweiterungen. Eine manuelle Deinstallation wird nicht empfohlen. Die vollständige Deinstallation erfolgt über Browser4Kodi.</description>
+        <platform>all</platform>
+        <license>MIT</license>
+    </extension>
+</addon>
