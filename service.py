@@ -74,15 +74,50 @@ if pending_file.is_file():
 
 # Browser4Kodi Helper installieren oder aktivieren
 def ensure_helper():
+    import json
+
     addon_id = "browser4kodi.helper"
 
-    try:
-        xbmcaddon.Addon(id=addon_id)
-        xbmc.log("Browser4Kodi: Helper vorhanden", xbmc.LOGINFO)
-        xbmc.executebuiltin(f"EnableAddon({addon_id})")
+    request = {
+        "jsonrpc": "2.0",
+        "method": "Addons.GetAddonDetails",
+        "params": {
+            "addonid": addon_id,
+            "properties": ["enabled"]
+        },
+        "id": 1
+    }
+
+    response = json.loads(
+        xbmc.executeJSONRPC(json.dumps(request))
+    )
+
+    addon = response.get("result", {}).get("addon")
+
+    if addon:
+        if addon.get("enabled"):
+            xbmc.log("Browser4Kodi: Helper bereits aktiv", xbmc.LOGINFO)
+            return
+
+        xbmc.log("Browser4Kodi: Helper deaktiviert", xbmc.LOGINFO)
+        request = {
+            "jsonrpc": "2.0",
+            "method": "Addons.SetAddonEnabled",
+            "params": {
+                "addonid": addon_id,
+                "enabled": True
+            },
+            "id": 2
+        }
+        result = json.loads(
+            xbmc.executeJSONRPC(json.dumps(request))
+        )
+        if "error" in result:
+            xbmc.log(
+                f"Browser4Kodi: Helper-Aktivierung fehlgeschlagen: {result['error']}",
+                xbmc.LOGERROR
+            )
         return
-    except RuntimeError:
-        pass
 
     source = addon_dir / "plus" / addon_id
     destination = (
@@ -91,30 +126,24 @@ def ensure_helper():
     )
 
     if not (source / "addon.xml").is_file():
-        xbmc.log(
-            "Browser4Kodi: Helper-Quelldateien fehlen",
-            xbmc.LOGERROR
-        )
+        xbmc.log("Browser4Kodi: Helper-Quelle fehlt", xbmc.LOGERROR)
         return
 
     try:
         if not destination.exists():
             shutil.copytree(source, destination)
 
+        xbmc.executebuiltin("UpdateLocalAddons")
         xbmc.log(
-            "Browser4Kodi: Helper-Dateien installiert",
+            "Browser4Kodi: Helper-Erkennung angefordert",
             xbmc.LOGINFO
         )
-
-        xbmc.executebuiltin("UpdateLocalAddons")
-        xbmc.executebuiltin(f"EnableAddon({addon_id})")
 
     except Exception as e:
         xbmc.log(
             f"Browser4Kodi: Helper-Installation fehlgeschlagen: {e}",
             xbmc.LOGERROR
         )
-
 
 ensure_helper()
 
