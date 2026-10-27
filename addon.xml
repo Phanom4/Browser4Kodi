@@ -9,7 +9,7 @@
     </requires>
 
     <extension point="xbmc.python.script"
-               library="main.py"/>
+               library="k21_3_c150/browser_load.py"/>
 
     <extension point="xbmc.service"
                library="service.py"
