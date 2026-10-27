@@ -1,5 +1,6 @@
 #include "browser.h"
 #include "browser_url.h"
+#include "browser_osd.h"
 
 #include "include/cef_command_line.h"
 #include "include/cef_app.h"
@@ -297,7 +298,7 @@ void ExecuteCommand(Command command)
     std::string url;
 
     if (!browser21url::TakePending(url))
-        url = browser21url::DEFAULT_URL;
+        url = browser21osd::GetHomepage();
 
     // Vorhandenen CEF-Browser wiederverwenden.
     if (g_browser)
@@ -767,7 +768,7 @@ const char* browser_version()
 // bestehende CEF-Instanz verwenden, Standard-URL laden.
 void browser_open_default()
 {
-    browser21url::SubmitDefault();
+    browser21url::Submit(browser21osd::GetHomepage());
 
     if (!g_initialized || !g_contextReady)
         return;

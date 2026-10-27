@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 // Browser 21.3 - eigenes Kodi-Browsermenue.
 // Das Menue verwendet Kodi DialogSelect und die vorhandene Kodi-Tastatur.
@@ -30,6 +31,8 @@ enum class StartMode
 // Die Auswahl wird als Action zurueckgegeben und spaeter zentral ausgefuehrt.
 // Bei "Tastatur" wird die URL schon an browser21url::Submit() uebergeben.
 Action Show();
+
+std::string GetHomepage();
 
 // Startverhalten nur waehrend der laufenden Kodi-Sitzung merken.
 // Ein spaeterer Anschluss an den Browserstart wertet diesen Schalter aus.

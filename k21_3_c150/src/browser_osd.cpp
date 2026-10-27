@@ -30,7 +30,7 @@ const std::filesystem::path& HomepageFile()
     return path;
 }
 
-std::string GetHomepage()
+std::string ReadHomepage()
 {
     std::ifstream file(HomepageFile());
     std::string url;
@@ -73,6 +73,14 @@ const char* StartModeLabel()
     return GetStartMode() == StartMode::Home ? "Startseite" : "Letzte Seite";
 }
 } // namespace
+
+std::string GetHomepage()
+{
+    if (!std::filesystem::exists(HomepageFile()))
+        SetHomepage(browser21url::DEFAULT_URL);
+
+    return ReadHomepage();
+}
 
 StartMode GetStartMode()
 {
