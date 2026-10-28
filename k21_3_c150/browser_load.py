@@ -11,28 +11,7 @@ from browser_retroplayer import RetroPlayerFrontend
 
 
 EXE = os.path.dirname(os.path.abspath(__file__))
-if xbmc.getCondVisibility("System.Platform.Windows"):
-    LIBRARY = os.path.join(EXE, "build", "windows", "browser.dll")
-elif xbmc.getCondVisibility("System.Platform.Linux"):
-    LIBRARY = os.path.join(EXE, "build", "browser.so")
-else:
-    raise RuntimeError("Browser4Kodi: Plattform nicht unterstützt")
-
-
-def load_browser():
-    if not os.path.isfile(LIBRARY):
-        raise FileNotFoundError(
-            "Browser4Kodi: Bibliothek fehlt: " + LIBRARY
-        )
-
-    if xbmc.getCondVisibility("System.Platform.Linux"):
-        return ctypes.CDLL(
-            LIBRARY,
-            mode=os.RTLD_NOW | os.RTLD_NODELETE
-        )
-
-    return ctypes.CDLL(LIBRARY)
-
+LIBRARY = os.path.join(EXE, "build", "browser.so")
 # Kodi ermittelt das Benutzerverzeichnis plattformunabhängig.
 DATA_DIR = xbmcvfs.translatePath(
     "special://profile/addon_data/browser4kodi/"
@@ -72,7 +51,10 @@ def selected_frontend():
 # Bereits laufende CEF-Steuerung weiterverwenden
 if window.getProperty(ACTIVE) == "1":
 
-    browser = load_browser()
+    browser = ctypes.CDLL(
+        LIBRARY,
+        mode=os.RTLD_NOW | os.RTLD_NODELETE
+    )
 
     browser.browser_open_default.argtypes = []
     browser.browser_open_default.restype = None
@@ -84,7 +66,10 @@ if window.getProperty(ACTIVE) == "1":
     log("Vorhandene CEF-Steuerung mit Startseite angefordert")
 
 else:
-    browser = load_browser()
+    browser = ctypes.CDLL(
+        LIBRARY,
+        mode=os.RTLD_NOW | os.RTLD_NODELETE
+    )
 
     browser.browser_run.argtypes = []
     browser.browser_run.restype = ctypes.c_int
