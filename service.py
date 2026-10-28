@@ -78,28 +78,24 @@ def ensure_helper():
 
     addon_id = "browser4kodi.helper"
 
-    request = {
-        "jsonrpc": "2.0",
-        "method": "Addons.GetAddonDetails",
-        "params": {
-            "addonid": addon_id,
-            "properties": ["enabled"]
-        },
-        "id": 1
-    }
+    def get_status():
+        request = {
+            "jsonrpc": "2.0",
+            "method": "Addons.GetAddonDetails",
+            "params": {
+                "addonid": addon_id,
+                "properties": ["enabled"]
+            },
+            "id": 1
+        }
 
-    response = json.loads(
-        xbmc.executeJSONRPC(json.dumps(request))
-    )
+        response = json.loads(
+            xbmc.executeJSONRPC(json.dumps(request))
+        )
 
-    addon = response.get("result", {}).get("addon")
+        return response.get("result", {}).get("addon")
 
-    if addon:
-        if addon.get("enabled"):
-            xbmc.log("Browser4Kodi: Helper bereits aktiv", xbmc.LOGINFO)
-            return
-
-        xbmc.log("Browser4Kodi: Helper deaktiviert", xbmc.LOGINFO)
+    def activate():
         request = {
             "jsonrpc": "2.0",
             "method": "Addons.SetAddonEnabled",
@@ -109,39 +105,78 @@ def ensure_helper():
             },
             "id": 2
         }
-        result = json.loads(
+
+        response = json.loads(
             xbmc.executeJSONRPC(json.dumps(request))
         )
-        if "error" in result:
+
+        if "error" in response:
             xbmc.log(
-                f"Browser4Kodi: Helper-Aktivierung fehlgeschlagen: {result['error']}",
+                f"Browser4Kodi: Helper-Aktivierung fehlgeschlagen: "
+                f"{response['error']}",
                 xbmc.LOGERROR
             )
-        return
+            return False
 
-    source = addon_dir / "plus" / addon_id
-    destination = (
-        Path(xbmcvfs.translatePath("special://home/addons"))
-        / addon_id
-    )
-
-    if not (source / "addon.xml").is_file():
-        xbmc.log("Browser4Kodi: Helper-Quelle fehlt", xbmc.LOGERROR)
-        return
-
-    try:
-        if not destination.exists():
-            shutil.copytree(source, destination)
-
-        xbmc.executebuiltin("UpdateLocalAddons")
         xbmc.log(
-            "Browser4Kodi: Helper-Erkennung angefordert",
+            "Browser4Kodi: Helper aktiviert",
             xbmc.LOGINFO
         )
+        return True
+
+    try:
+        addon = get_status()
+
+        if addon and addon.get("enabled"):
+            xbmc.log(
+                "Browser4Kodi: Helper bereits aktiv",
+                xbmc.LOGINFO
+            )
+            return
+
+        if not addon:
+            source = addon_dir / "plus" / addon_id
+            destination = (
+                Path(xbmcvfs.translatePath("special://home/addons"))
+                / addon_id
+            )
+
+            if not (source / "addon.xml").is_file():
+                xbmc.log(
+                    "Browser4Kodi: Helper-Quelle fehlt",
+                    xbmc.LOGERROR
+                )
+                return
+
+            if not destination.exists():
+                shutil.copytree(source, destination)
+
+            xbmc.executebuiltin("UpdateLocalAddons")
+
+            # Warten, bis Kodi den Helper registriert hat.
+            for attempt in range(20):
+                if monitor.waitForAbort(0.5):
+                    return
+
+                addon = get_status()
+
+                if addon:
+                    break
+
+            if not addon:
+                xbmc.log(
+                    "Browser4Kodi: Helper nicht registriert",
+                    xbmc.LOGERROR
+                )
+                return
+
+        # Nur aktivieren, wenn tatsächlich deaktiviert.
+        if not addon.get("enabled"):
+            activate()
 
     except Exception as e:
         xbmc.log(
-            f"Browser4Kodi: Helper-Installation fehlgeschlagen: {e}",
+            f"Browser4Kodi: Helper-Prüfung fehlgeschlagen: {e}",
             xbmc.LOGERROR
         )
 
