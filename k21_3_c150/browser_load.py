@@ -109,7 +109,6 @@ else:
                 aborted = monitor.waitForAbort(0.2)
                 now = time.monotonic()
                 if now - last_debug >= 2:
-                    log("SHUTDOWN: Python-Schleife lebt")
                     last_debug = now
                     
                 if aborted:
