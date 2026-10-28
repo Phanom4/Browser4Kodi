@@ -182,7 +182,36 @@ def ensure_helper():
 
 ensure_helper()
 
+
+# Kodi-Deinstallationsdialog beobachten
+def watch_uninstall_dialog():
+    dialog_seen = False
+
+    while not monitor.abortRequested():
+        dialog_open = xbmc.getCondVisibility(
+            "Window.IsActive(10100)"
+        )
+
+        if dialog_open:
+            dialog_seen = True
+
+        elif dialog_seen:
+            dialog_seen = False
+
+            # Erst zwei Sekunden nach dem Schließen prüfen.
+            if monitor.waitForAbort(2):
+                break
+
+            xbmc.log(
+                "Browser4Kodi: Dialog geschlossen, Helper prüfen",
+                xbmc.LOGINFO
+            )
+
+            ensure_helper()
+
+        if monitor.waitForAbort(0.2):
+            break
+
+
 # Service aktiv halten
-while not monitor.abortRequested():
-    if monitor.waitForAbort(1):
-        break
+watch_uninstall_dialog()
