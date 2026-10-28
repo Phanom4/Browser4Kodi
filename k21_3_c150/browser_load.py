@@ -5,12 +5,19 @@ import threading
 import xbmc
 import xbmcgui
 import time
+import xbmcvfs
 
 from browser_retroplayer import RetroPlayerFrontend
 
 
 EXE = os.path.dirname(os.path.abspath(__file__))
 LIBRARY = os.path.join(EXE, "build", "browser.so")
+# Kodi ermittelt das Benutzerverzeichnis plattformunabhängig.
+DATA_DIR = xbmcvfs.translatePath(
+    "special://profile/addon_data/browser4kodi/"
+)
+
+os.environ["BROWSER4KODI_DATA_DIR"] = DATA_DIR
 
 # Gemeinsame Steuerung über das Kodi-Home-Fenster
 window = xbmcgui.Window(10000)

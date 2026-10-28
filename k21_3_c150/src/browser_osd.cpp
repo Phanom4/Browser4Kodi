@@ -35,9 +35,15 @@ const std::filesystem::path& StartModeFile()
 // Startseite im Kodi-Benutzerprofil speichern.
 const std::filesystem::path& HomepageFile()
 {
-    static const std::filesystem::path path =
-        std::filesystem::path(std::getenv("HOME")) /
-            ".kodi/userdata/addon_data/browser4kodi/homepage.txt";
+    static const std::filesystem::path path = [] {
+        const char* dataDir = std::getenv("BROWSER4KODI_DATA_DIR");
+
+        if (!dataDir || !*dataDir)
+            return std::filesystem::path{};
+
+        return std::filesystem::path(dataDir) / "homepage.txt";
+    }();
+
     return path;
 }
 
