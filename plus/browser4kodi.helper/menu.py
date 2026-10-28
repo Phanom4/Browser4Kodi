@@ -2,6 +2,8 @@ import xbmc
 import xbmcaddon
 import helper_skin
 import xbmcgui
+import xbmcvfs
+from pathlib import Path
 
 
 def installed(addon_id):
@@ -14,6 +16,9 @@ def installed(addon_id):
 
 
 def skin_debug():
+    skin = Path(xbmcvfs.translatePath(
+        "special://home/addons/skin.confluence/1080p/"
+    ))
     names = [
         "browser-menu",
         "browser-osd",
@@ -31,7 +36,7 @@ def skin_debug():
     try:
         active = [
             i for i, name in enumerate(names)
-            if helper_skin.skin_status(helper_skin.SKIN, name)
+            if helper_skin.skin_status(skin, name)
         ]
 
         selected = xbmcgui.Dialog().multiselect(
@@ -55,7 +60,7 @@ def skin_debug():
 
             try:
                 if helper_skin.change_skin(
-                    helper_skin.SKIN, name, enabled
+                    skin, name, enabled
                 ):
                     changed = True
             except Exception as e:
