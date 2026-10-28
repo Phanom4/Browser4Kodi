@@ -172,7 +172,9 @@ def ensure_helper():
 
         # Nur aktivieren, wenn tatsächlich deaktiviert.
         if not addon.get("enabled"):
-            activate()
+            if activate():
+                xbmc.executebuiltin("UpdateLocalAddons")
+                xbmc.executebuiltin("Container.Refresh")
 
     except Exception as e:
         xbmc.log(
