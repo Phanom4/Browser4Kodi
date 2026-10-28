@@ -10,6 +10,7 @@
 #include "utils/Variant.h"
 
 #include <atomic>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <mutex>
@@ -49,6 +50,9 @@ const std::filesystem::path& HomepageFile()
 
 std::string ReadHomepage()
 {
+    if (HomepageFile().empty())
+        return browser21url::DEFAULT_URL;
+
     std::ifstream file(HomepageFile());
     std::string url;
 
@@ -66,6 +70,9 @@ std::string ReadHomepage()
 
 bool SetHomepage(const std::string& url)
 {
+    if (HomepageFile().empty())
+        return false;
+
     if (url.find_first_not_of(" \\t\\r\\n") == std::string::npos)
         return false;
 
@@ -93,6 +100,9 @@ const char* StartModeLabel()
 
 std::string GetHomepage()
 {
+    if (HomepageFile().empty())
+        return browser21url::DEFAULT_URL;
+
     if (!std::filesystem::exists(HomepageFile()))
         SetHomepage(browser21url::DEFAULT_URL);
 
@@ -102,6 +112,15 @@ std::string GetHomepage()
 StartMode GetStartMode()
 {
     std::call_once(g_startModeInit, [] {
+        if (HomepageFile().empty())
+            return;
+
+        std::error_code error;
+        std::filesystem::create_directories(
+            StartModeFile().parent_path(), error);
+        if (error)
+            return;
+
         std::ifstream file(StartModeFile());
         std::string value;
 
@@ -123,6 +142,9 @@ StartMode GetStartMode()
 
 void SetStartMode(StartMode mode)
 {
+    if (HomepageFile().empty())
+        return;
+
     GetStartMode();
 
     std::ofstream file(StartModeFile(), std::ios::trunc);
