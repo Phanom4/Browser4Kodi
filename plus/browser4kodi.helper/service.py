@@ -1,4 +1,5 @@
 import xbmc
+import xbmcvfs
 import json
 import subprocess
 import sys
@@ -37,7 +38,7 @@ def cleanup_browser_skin():
         return
 
     result = subprocess.run(
-        [sys.executable, str(script), "-0"],
+        [sys.executable, str(script), "-0", xbmcvfs.translatePath("special://home/addons/skin.confluence/1080p/")],
         capture_output=True,
         text=True
     )

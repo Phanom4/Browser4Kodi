@@ -44,7 +44,7 @@ if pending_file.is_file():
 
     try:
         result = subprocess.run(
-            [sys.executable, str(skin_script)],
+            [sys.executable, str(skin_script), xbmcvfs.translatePath("special://home/addons/skin.confluence/1080p/")],
             capture_output=True,
             text=True
         )

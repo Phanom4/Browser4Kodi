@@ -15,8 +15,7 @@ import sys
 KODI_SPECIAL_PROFILE = "special://profile/"
 
 # Fuer die aktuelle externe Python-Installation unter Linux:
-PROFILE = Path.home() / ".kodi"
-SKIN = PROFILE / "addons/skin.confluence/1080p"
+SKIN = Path(sys.argv[-1]) if len(sys.argv) >= 2 else None
 
 # ============================================================
 # Browser
@@ -527,7 +526,9 @@ def change_skin(skin, name, enable):
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:]
+    if SKIN is None:
+        sys.exit("Skin-Pfad fehlt")
+    args = sys.argv[1:-1]
     changed = False
 
     if len(args) == 2 and args[0] in SKIN_FILES:
