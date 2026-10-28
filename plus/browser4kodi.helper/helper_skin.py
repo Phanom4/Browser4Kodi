@@ -424,19 +424,145 @@ def uninstall_skin(skin):
 
     print("browser: Skin-Deinstallation abgeschlossen")
 
-if __name__ == "__main__":
-    if sys.argv[1:] == ["-1"]:
-        install_skin(SKIN, with_hbbtv=False)
-    elif sys.argv[1:] == ["-1", "hbbtv"]:
-        install_skin(SKIN, with_hbbtv=True)
-    elif sys.argv[1:] == ["-0"]:
-        uninstall_skin(SKIN)
-    else:
-        print("Verwendung: browser_skin.py -1 [hbbtv] | -0")
-        sys.exit(1)
 
-    try:
-        import xbmc
-        xbmc.executebuiltin("ReloadSkin()")
-    except ModuleNotFoundError:
-        pass
+# ============================================================
+# Einzelne Skin-Anpassungen
+# ============================================================
+
+SKIN_FILES = {
+    "browser-menu": "Home.xml",
+    "browser-osd": "GameOSD.xml",
+    "hbbtv-pvr": "IncludesPVR.xml",
+    "hbbtv-tv": "IncludesHomeMenuItems.xml",
+}
+
+
+def skin_status(skin, name):
+    path = skin / SKIN_FILES[name]
+
+    if not path.is_file():
+        return False
+
+    content = path.read_text(encoding="utf-8")
+
+    if name == "browser-menu":
+        return (
+            "<!-- browser START -->" in content
+            and "<!-- browser END -->" in content
+        )
+
+    if name == "browser-osd":
+        return all(
+            new in content
+            for old, new in gameosd_rules()
+        )
+
+    if name == "hbbtv-pvr":
+        return bool(re.search(
+            r'<control type="button" id="33">.*?'
+            r'<label>HbbTV</label>.*?</control>',
+            content,
+            re.DOTALL
+        ))
+
+    if name == "hbbtv-tv":
+        start = content.find('<include name="HomeSubMenuTV">')
+        if start < 0:
+            return False
+
+        end = content.find('<include name="', start + 1)
+        area = content[start:end] if end >= 0 else content[start:]
+
+        return bool(re.search(
+            r'<control type="button" id="33">.*?'
+            r'<label>HbbTV</label>.*?</control>',
+            area,
+            re.DOTALL
+        ))
+
+    raise ValueError(name)
+
+
+def change_skin(skin, name, enable):
+    if name not in SKIN_FILES:
+        raise ValueError(f"Unbekannter Skin: {name}")
+
+    path = skin / SKIN_FILES[name]
+
+    if not path.is_file():
+        raise RuntimeError(f"Skin-Datei fehlt: {path}")
+
+    current = skin_status(skin, name)
+
+    if current == enable:
+        print(f"{name}: bereits {'aktiv' if enable else 'inaktiv'}")
+        return False
+
+    if enable:
+        backup = path.with_name(path.name + ".browser.bak")
+        if not backup.exists():
+            shutil.copy2(path, backup)
+
+        if name == "browser-menu":
+            install_browser_menu(path)
+        elif name == "browser-osd":
+            install_gameosd(skin)
+        elif name == "hbbtv-pvr":
+            replace_or_insert_pvr(path)
+        elif name == "hbbtv-tv":
+            replace_or_insert_home(path)
+
+    else:
+        if name == "browser-menu":
+            uninstall_browser_menu(path)
+        elif name == "browser-osd":
+            uninstall_gameosd(skin)
+        elif name == "hbbtv-pvr":
+            remove_control(path)
+        elif name == "hbbtv-tv":
+            remove_control(path, home=True)
+
+    print(f"{name}: {'aktiviert' if enable else 'deaktiviert'}")
+    return True
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    changed = False
+
+    if len(args) == 2 and args[0] in SKIN_FILES:
+        name, action = args
+
+        if action == "status":
+            print("aktiv" if skin_status(SKIN, name) else "inaktiv")
+            sys.exit(0)
+
+        if action in ("+", "-"):
+            changed = change_skin(SKIN, name, action == "+")
+        else:
+            sys.exit("Aktion muss +, - oder status sein")
+
+    elif args == ["-1"]:
+        install_skin(SKIN, with_hbbtv=False)
+        changed = True
+
+    elif args == ["-1", "hbbtv"]:
+        install_skin(SKIN, with_hbbtv=True)
+        changed = True
+
+    elif args == ["-0"]:
+        uninstall_skin(SKIN)
+        changed = True
+
+    else:
+        sys.exit(
+            "Verwendung: helper_skin.py "
+            "<skin> [+|-|status] | -1 [hbbtv] | -0"
+        )
+
+    if changed:
+        try:
+            import xbmc
+            xbmc.executebuiltin("ReloadSkin()")
+        except ModuleNotFoundError:
+            pass
