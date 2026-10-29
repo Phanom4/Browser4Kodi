@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/browser_helper.dir/link.d CMakeFiles/browser_helper.dir/src/browser_helper.cpp.o -o Linux_x64/browser_helper  -Wl,-rpath,"\$ORIGIN/../../cef/Release" cef-wrapper-gcc/libcef_dll_wrapper/libcef_dll_wrapper.a /run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/cef/Release/libcef.so -lpthread -ldl -lsqlite3

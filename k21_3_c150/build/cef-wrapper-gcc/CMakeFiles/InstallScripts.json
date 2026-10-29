@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/cmake_install.cmake",
+		"/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/libcef_dll_wrapper/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

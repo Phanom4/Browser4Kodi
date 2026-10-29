@@ -28,8 +28,38 @@ rm -rf build
 #Browser4Kodi
 cmake -S . -B build && cmake --build build -j 64
 
+
 # ======================
-# Version 3
+# Version 2
+# ======================
+
+# Qellen
+wget -O Browser4Kodi-addon.zip \
+https://github.com/Phanom4/Browser4Kodi/releases/download/beta/Browser4Kodi-addon.zip
+unzip  Browser4Kodi-addon.zip
+cd Browser4Kodi/k21_3_c150/
+# 1. Neu beginnen
+rm -rf build cef chromium depot_tools automate-git.py
+
+wget -c -O cef-linux64.tar.bz2 \
+'https://cef-builds.spotifycdn.com/cef_binary_150.0.22%2Bgc1a097e%2Bchromium-150.0.7871.256_linux64_minimal.tar.bz2'
+
+mkdir -p cef
+
+tar -xjf cef-linux64.tar.bz2 \
+  -C cef \
+  --strip-components=1
+
+strip --strip-debug cef/Release/libcef.so
+
+rm /opt/git/browser_k21_3_c150/k21_3_c150/cef-linux64.tar.bz2
+
+
+
+
+
+# ======================
+# Version 4 linux
 # ======================
 # Bitte Beachten
 # 50 Gb festplattenspeicher
@@ -42,11 +72,35 @@ cmake -S . -B build && cmake --build build -j 64
 wget -O Browser4Kodi-addon.zip \
 https://github.com/Phanom4/Browser4Kodi/releases/download/beta/Browser4Kodi-addon.zip
 unzip  Browser4Kodi-addon.zip
-cd Browser4Kodi-addon/Browser4Kodi/k21_3_c150/
+cd Browser4Kodi/k21_3_c150/
+# 1. Neu beginnen
 rm -rf build cef chromium depot_tools automate-git.py
+
 git clone --branch 7871 --single-branch https://github.com/chromiumembedded/cef.git cef
+
 wget https://raw.githubusercontent.com/chromiumembedded/cef/master/tools/automate/automate-git.py
-python3 automate-git.py --download-dir="$(pwd)" --branch=7871 --no-build --no-distrib --no-chromium-history --x64-build
+
+# 2. Quellen herunterladen, noch nicht bauen
+python3 automate-git.py \
+  --download-dir="$(pwd)" \
+  --branch=7871 \
+  --no-build \
+  --no-distrib \
+  --no-chromium-history \
+  --x64-build
+
+# 3. Synchronisierung wiederholen und Ergebnis prüfen
+cd chromium
+../depot_tools/gclient sync --nohooks --no-history
+
+if [ $? -ne 0 ]; then
+    echo "FEHLER: Chromium-Synchronisierung unvollständig"
+else
+    echo "Chromium-Synchronisierung erfolgreich"
+fi
+
+cd ..
+
 
 GN_DEFINES="is_official_build=true use_sysroot=true symbol_level=0 is_cfi=false use_thin_lto=false chrome_pgo_phase=0" \
 python3 automate-git.py \

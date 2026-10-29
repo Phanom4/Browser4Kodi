@@ -717,7 +717,7 @@ void OwnerThread()
 
     const fs::path base =
         fs::absolute(info.dli_fname).parent_path().parent_path().parent_path();
-    const fs::path cef = base / "chromium/src/out/Release_GN_x64";
+    const fs::path cef = base / "cef/Release";
     const fs::path build = base / "build/Linux_x64";
 
     char processName[] = "browser";
@@ -751,10 +751,10 @@ void OwnerThread()
         (build / "browser_helper").string();
 
     CefString(&settings.resources_dir_path) =
-        cef.string();
+        (base / "cef/Resources").string();
 
     CefString(&settings.locales_dir_path) =
-        (cef / "locales").string();
+        (base / "cef/Resources/locales").string();
 
     CefRefPtr<SimpleApp> app(new SimpleApp);
 

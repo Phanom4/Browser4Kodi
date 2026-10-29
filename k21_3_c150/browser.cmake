@@ -1,16 +1,27 @@
 # browser - eigener Build, unabhängig vom Kodi-Hauptbuild
 
 set(BROWSER_DIR "${CMAKE_CURRENT_LIST_DIR}")
-set(CEF_ROOT "${BROWSER_DIR}/chromium/src/out/Release_GN_x64")
-file(GLOB CEF_DISTRIBUTIONS
-    "${BROWSER_DIR}/chromium/src/cef/binary_distrib/cef_binary_*_linux64"
-)
+set(CEF_ROOT "${BROWSER_DIR}/cef/Release")
+set(CEF_HEADER_ROOT "${BROWSER_DIR}/cef")
 
-list(LENGTH CEF_DISTRIBUTIONS CEF_COUNT)
-if(NOT CEF_COUNT EQUAL 1)
-    message(FATAL_ERROR "Genau eine CEF-Binary-Distribution erforderlich")
-endif()
-list(GET CEF_DISTRIBUTIONS 0 CEF_HEADER_ROOT)
+# CEF-Ressourcen für Chromium unter Release bereitstellen
+foreach(resource
+    icudtl.dat
+    chrome_100_percent.pak
+    chrome_200_percent.pak
+    resources.pak
+)
+    if(NOT EXISTS "${BROWSER_DIR}/cef/Resources/${resource}")
+        message(FATAL_ERROR "CEF-Ressource fehlt: ${resource}")
+    endif()
+
+    file(CREATE_LINK
+        "../Resources/${resource}"
+        "${CEF_ROOT}/${resource}"
+        SYMBOLIC
+        COPY_ON_ERROR
+    )
+endforeach()
 
 # ============================================================
 # GCC-CEF-Wrapper automatisch bauen (ein Build, keine Handarbeit)
@@ -93,7 +104,7 @@ set_target_properties(browser PROPERTIES
     PREFIX ""
     OUTPUT_NAME "browser"
     BUILD_WITH_INSTALL_RPATH TRUE
-    INSTALL_RPATH "$ORIGIN/../../chromium/src/out/Release_GN_x64"
+    INSTALL_RPATH "$ORIGIN/../../cef/Release"
 )
 
 
@@ -128,7 +139,7 @@ target_link_libraries(browser_helper PRIVATE
 set_target_properties(browser_helper PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${BROWSER_DIR}/build/Linux_x64"
     BUILD_WITH_INSTALL_RPATH TRUE
-    INSTALL_RPATH "$ORIGIN/../../chromium/src/out/Release_GN_x64"
+    INSTALL_RPATH "$ORIGIN/../../cef/Release"
 )
 
 # CEF-BGRA direkt als Rawvideo-Stream für Kodi VideoPlayer
@@ -139,17 +150,4 @@ target_link_options(browser PRIVATE "-Wl,-z,nodelete")
 
 # Kodi-interne RetroPlayer-Header benötigen TARGET_POSIX
 target_compile_definitions(browser PRIVATE TARGET_POSIX)
-
-# Chromium LLD 23 für CEF-150-Objektdateien mit CREL
-set(CEF_LLD_BIN
-    "${BROWSER_DIR}/chromium/src/third_party/llvm-build/Release+Asserts/bin"
-)
-
-foreach(target browser browser_helper)
-    target_link_options(${target} PRIVATE
-        "-fuse-ld=lld"
-        "-B${CEF_LLD_BIN}/"
-    )
-endforeach()
-
 
