@@ -11,7 +11,7 @@ from browser_retroplayer import RetroPlayerFrontend
 
 
 EXE = os.path.dirname(os.path.abspath(__file__))
-LIBRARY = os.path.join(EXE, "build", "browser.so")
+LIBRARY = os.path.join(EXE, "build", "Linux_x64", "browser.so")
 # Kodi ermittelt das Benutzerverzeichnis plattformunabhängig.
 DATA_DIR = xbmcvfs.translatePath(
     "special://profile/addon_data/browser4kodi/"

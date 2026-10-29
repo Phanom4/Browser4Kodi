@@ -292,7 +292,7 @@ std::string LastHistoryUrl()
         return {};
 
     const fs::path base =
-        fs::absolute(info.dli_fname).parent_path().parent_path();
+        fs::absolute(info.dli_fname).parent_path().parent_path().parent_path();
 
     const fs::path history = base / "cache/Default/History";
 
@@ -716,9 +716,9 @@ void OwnerThread()
     }
 
     const fs::path base =
-        fs::absolute(info.dli_fname).parent_path().parent_path();
+        fs::absolute(info.dli_fname).parent_path().parent_path().parent_path();
     const fs::path cef = base / "chromium/src/out/Release_GN_x64";
-    const fs::path build = base / "build";
+    const fs::path build = base / "build/Linux_x64";
 
     char processName[] = "browser";
     char native[] = "--use-native";
