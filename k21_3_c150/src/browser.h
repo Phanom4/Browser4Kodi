@@ -12,7 +12,8 @@ class CBrowser_21_3 final : public CefClient,
                            public CefRenderHandler
 {
 public:
-  CBrowser_21_3() = default;
+  CBrowser_21_3(int width, int height)
+    : m_width(width), m_height(height) {}
 
   CefRefPtr<CefRenderHandler> GetRenderHandler() override
   {

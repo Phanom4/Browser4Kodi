@@ -12,12 +12,8 @@ Solange Browser4Kodi installiert ist, wird der Helper bei einer manuellen Deinst
 # ======================
 # Qellen
 wget -O Browser4Kodi-addon.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
-unzip  Browser4Kodi-addon.zip
-cd Browser4Kodi 
-#install
-#python browser_install_0_1.py -1
-python browser_k21_3_c150_install_0_1.py -1
+https://github.com/Phanom4/Browser4Kodi/releases/download/beta/Browser4Kodi-addon.zip
+install in Kodi Addon aus Zip-Datei installieren
 
 
 # ======================
@@ -25,7 +21,7 @@ python browser_k21_3_c150_install_0_1.py -1
 # ======================
 # Qellen
 wget -O Browser4Kodi-addon.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
+https://github.com/Phanom4/Browser4Kodi/releases/download/beta/Browser4Kodi-addon.zip
 unzip  Browser4Kodi-addon.zip
 cd Browser4Kodi/k21_3_c150
 rm -rf build
@@ -44,7 +40,7 @@ cmake -S . -B build && cmake --build build -j 64
 
 # Qellen
 wget -O Browser4Kodi-addon.zip \
-  https://github.com/Phanom4/Browser4Kodi/releases/download/v0.0.2-test/Browser4Kodi-addon.zip
+https://github.com/Phanom4/Browser4Kodi/releases/download/beta/Browser4Kodi-addon.zip
 unzip  Browser4Kodi-addon.zip
 cd Browser4Kodi-addon/Browser4Kodi/k21_3_c150/
 rm -rf build cef chromium depot_tools automate-git.py

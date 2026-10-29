@@ -27,6 +27,7 @@ void browser_mouse_wheel(int x, int y, int deltaX, int deltaY);
 void browser_key_event(int pressed, int vkey, int native, unsigned int unicode,
                              unsigned int kodiModifiers);
 void browser_navigation(int action);
+void browser_zoom(int action);
 void browser_open_url();
 }
 
@@ -160,6 +161,38 @@ CServiceBroker::GetWinSystem()->ShowOSMouse(true);
     bool OnKeyPress(const CKey& key) override {
         if (!CefActive()) return false;
 
+        const int vk = key.GetVKey();
+
+    // Escape öffnet unser Browser-Menü statt des Kodi-Game-Menüs.
+    if (vk == XBMCVK_ESCAPE)
+    {
+        OnButtonRelease(KODI::MOUSE::BUTTON_ID::RIGHT);
+        return true;
+    }
+
+        if (key.GetModifiers() & CKey::MODIFIER_CTRL)
+        {
+            const unsigned int ch = key.GetUnicode();
+            int zoom = 2; // Kein Zoom-Kürzel
+
+            if (vk == 0xBB || vk == 0x6B ||
+                ch == '+' || ch == '=')
+                zoom = 1;
+            else if (vk == 0xBD || vk == 0x6D ||
+                     ch == '-')
+                zoom = -1;
+            else if (vk == 0x30 || vk == 0x60 ||
+                     ch == '0')
+                zoom = 0;
+
+            if (zoom != 2)
+            {
+                m_zoomKey = vk;
+                browser_zoom(zoom);
+                return true;
+            }
+        }
+
         // Einzige reservierte Tastenkombination: Strg+B -> eigenes Kodi-OSD.
         if (key.GetVKey() == XBMCVK_B &&
     (key.GetModifiers() & CKey::MODIFIER_CTRL)) {
@@ -178,6 +211,15 @@ CServiceBroker::GetWinSystem()->ShowOSMouse(true);
     }
 
     void OnKeyRelease(const CKey& key) override {
+        if (key.GetVKey() == XBMCVK_ESCAPE)
+            return;
+
+        if (key.GetVKey() == m_zoomKey)
+        {
+            m_zoomKey = -1;
+            return;
+        }
+
         if (!CefActive()) return;
         browser_key_event(0, WindowsVKey(key.GetVKey()), key.GetKeycode(),
                               0, key.GetModifiers());
@@ -195,14 +237,12 @@ private:
     int ScaledX() const {
         const int width = std::max(1, CServiceBroker::GetWinSystem()
                                          ->GetGfxContext().GetWidth());
-        return std::clamp(static_cast<int>(static_cast<long long>(m_x) * 1280 / width),
-                          0, 1279);
+        return std::clamp(m_x, 0, width - 1);
     }
     int ScaledY() const {
         const int height = std::max(1, CServiceBroker::GetWinSystem()
                                           ->GetGfxContext().GetHeight());
-        return std::clamp(static_cast<int>(static_cast<long long>(m_y) * 720 / height),
-                          0, 719);
+        return std::clamp(m_y, 0, height - 1);
     }
     void MouseButton(int button, int pressed) {
         browser_mouse_button(ScaledX(), ScaledY(), button, pressed);
@@ -213,6 +253,7 @@ private:
 
     int m_x{0};
     int m_y{0};
+    int m_zoomKey{-1};
 };
 
 inline Handler& Instance() {

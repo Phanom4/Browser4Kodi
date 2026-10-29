@@ -91,7 +91,8 @@ def main():
     entries = [
         "Browser4Kodi: " + ("Installiert" if browser else "Nicht installiert"),
         "Browser4Kodi HbbTV",
-        "Skin-Debug"
+        "Skin-Debug",
+        "Backend beenden (Test)"
     ]
 
     selected = dialog.select(
@@ -116,6 +117,32 @@ def main():
 
     elif selected == 2:
         skin_debug()
+
+    elif selected == 3:
+        if not dialog.yesno(
+            "CEF-Backend",
+            "CEF-Backend vollständig beenden? "
+            "Ein erneuter Start ist in diesem Test nicht vorgesehen."
+        ):
+            return
+
+        window = xbmcgui.Window(10000)
+
+        if window.getProperty("browser.ControllerActive") != "1":
+            dialog.ok(
+                "CEF-Backend",
+                "Keine aktive Browser4Kodi-Steuerung gefunden."
+            )
+            return
+
+        window.setProperty(
+            "browser.BackendShutdownRequested", "1"
+        )
+
+        xbmc.log(
+            "Browser4Kodi Helper: Backend-Shutdown angefordert",
+            xbmc.LOGINFO
+        )
 
 
 if __name__ == "__main__":

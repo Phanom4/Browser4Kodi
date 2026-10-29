@@ -8,13 +8,17 @@ import xbmcgui
 class RetroPlayerFrontend:
 
 
-    def __init__(self, browser, monitor):
+    def __init__(self, browser, monitor, width, height):
         self.browser = browser
         self.monitor = monitor
+        self.width = width
+        self.height = height
         self.retro = 0
         self.gui = 0
 
-        browser.browser_retro_probe.argtypes = []
+        browser.browser_retro_probe.argtypes = [
+            ctypes.c_uint, ctypes.c_uint
+        ]
         browser.browser_retro_probe.restype = ctypes.c_int
 
         browser.browser_retro_frame_count.argtypes = []
@@ -35,7 +39,9 @@ class RetroPlayerFrontend:
         if player.isPlaying():
             player.stop()
 
-        self.retro = self.browser.browser_retro_probe()
+        self.retro = self.browser.browser_retro_probe(
+            self.width, self.height
+        )
 
         if self.retro != 1:
             raise RuntimeError("RetroPlayer OpenStream fehlgeschlagen")

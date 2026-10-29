@@ -154,8 +154,11 @@ void RetroCefFrame(const uint8_t* bgra,
 }
 }
 
-extern "C" int browser_retro_probe()
+extern "C" int browser_retro_probe(
+    unsigned int width, unsigned int height)
 {
+    if (!width || !height)
+        return -1;
     using namespace KODI::RETRO;
 
     auto& process = g_retro_process;
@@ -197,8 +200,8 @@ extern "C" int browser_retro_probe()
 
         VideoStreamProperties properties(
             AV_PIX_FMT_0RGB32,
-            1280, 720,
-            1280, 720,
+            width, height,
+            width, height,
             1.0f
         );
 

@@ -47,6 +47,9 @@ bool g_shutdown = false;
 
 int g_result = 0;
 
+int g_screenWidth = 1280;
+int g_screenHeight = 720;
+
 CefRefPtr<CefBrowser> g_browser;
 CefRefPtr<CefClient> g_client;
 
@@ -88,7 +91,7 @@ class SimpleClient final : public CefClient,
 {
 public:
     SimpleClient()
-        : m_renderer(new CBrowser_21_3()),
+        : m_renderer(new CBrowser_21_3(g_screenWidth, g_screenHeight)),
           m_audio(browser_create_audio_handler())
     {
     }
@@ -439,6 +442,42 @@ void ExecuteCommand(Command command)
 // Browser-Navigation auf dem CEF-UI-Thread
 // ============================================================
 
+class BrowserZoomTask final : public CefTask
+{
+public:
+    explicit BrowserZoomTask(int action) : m_action(action) {}
+
+    void Execute() override
+    {
+        if (!g_browser)
+            return;
+
+        auto host = g_browser->GetHost();
+        if (!host)
+            return;
+
+        double level = host->GetZoomLevel();
+
+        if (m_action == 0)
+            level = 0.0;
+        else if (m_action > 0)
+            level += 1.0;
+        else
+            level -= 1.0;
+
+        if (level < -10.0)
+            level = -10.0;
+        if (level > 10.0)
+            level = 10.0;
+
+        host->SetZoomLevel(level);
+    }
+
+private:
+    int m_action;
+    IMPLEMENT_REFCOUNTING(BrowserZoomTask);
+};
+
 class BrowserNavigationTask final : public CefTask
 {
 public:
@@ -738,8 +777,13 @@ void OwnerThread()
     // Die Loop bleibt auch ohne geöffneten Browser aktiv.
     CefRunMessageLoop();
 
-    // Erst beim endgültigen Kodi-Prozessende.
+    std::cerr << "browser: BACKEND CefShutdown BEGIN"
+              << std::endl;
+
     CefShutdown();
+
+    std::cerr << "browser: BACKEND CefShutdown ENDE"
+              << std::endl;
 
     {
         std::lock_guard<std::mutex> lock(g_mutex);
@@ -788,6 +832,17 @@ void browser_open_url()
         return;
 
     PostCommand(Command::Open);
+}
+
+void browser_zoom(int action)
+{
+    if (action < -1 || action > 1)
+        return;
+
+    if (!g_initialized || !g_contextReady)
+        return;
+
+    CefPostTask(TID_UI, new BrowserZoomTask(action));
 }
 
 void browser_navigation(int action)
@@ -845,6 +900,53 @@ void browser_open_default()
         return;
 
     PostCommand(Command::Open);
+}
+
+// Manueller Test: Nur das CEF-Backend herunterfahren.
+void browser_backend_shutdown()
+{
+    bool ready = false;
+
+    {
+        std::lock_guard<std::mutex> lock(g_mutex);
+
+        if (g_shutdown || !g_initialized)
+            return;
+
+        g_shutdown = true;
+        ready = g_contextReady;
+    }
+
+    std::cerr << "browser: BACKEND Shutdown angefordert"
+              << std::endl;
+
+    if (ready)
+        PostCommand(Command::Quit);
+}
+
+// Status erst nach abgeschlossenem CefShutdown() = 0.
+int browser_backend_active()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    return g_initialized ? 1 : 0;
+}
+
+// Kodi-Auflösung vor der CEF-Initialisierung setzen.
+void browser_set_resolution(int width, int height)
+{
+    if (width <= 0 || height <= 0)
+        return;
+
+    std::lock_guard<std::mutex> lock(g_mutex);
+
+    if (g_owner.joinable())
+        return;
+
+    g_screenWidth = width;
+    g_screenHeight = height;
+
+    std::cerr << "browser: CEF Aufloesung "
+              << width << "x" << height << std::endl;
 }
 
 void browser_stop()

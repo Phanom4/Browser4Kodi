@@ -38,6 +38,7 @@ monitor = BrowserMonitor()
 
 ACTIVE = "browser.ControllerActive"
 REQUEST = "browser.OpenRequested"
+BACKEND_SHUTDOWN = "browser.BackendShutdownRequested"
 
 
 def log(message):
@@ -77,6 +78,31 @@ else:
     browser.browser_stop.argtypes = []
     browser.browser_stop.restype = None
 
+    browser.browser_backend_shutdown.argtypes = []
+    browser.browser_backend_shutdown.restype = None
+
+    browser.browser_backend_active.argtypes = []
+    browser.browser_backend_active.restype = ctypes.c_int
+
+    screen_width = int(xbmcgui.getScreenWidth())
+    screen_height = int(xbmcgui.getScreenHeight())
+
+    if screen_width <= 0 or screen_height <= 0:
+        raise RuntimeError("Ungueltige Kodi-Aufloesung")
+
+    browser.browser_set_resolution.argtypes = [
+        ctypes.c_int, ctypes.c_int
+    ]
+    browser.browser_set_resolution.restype = None
+
+    browser.browser_set_resolution(
+        screen_width, screen_height
+    )
+
+    log("Kodi-Aufloesung: {}x{}".format(
+        screen_width, screen_height
+    ))
+
     cef_result = [None]
 
     def run_cef():
@@ -101,6 +127,7 @@ else:
 
         # Steuerung bleibt bis zum Kodi-Shutdown bestehen
         last_debug = time.monotonic()
+        backend_shutdown_requested = False
         while True:
             if monitor.quitting.is_set():
                 log("SHUTDOWN: Python-Steuerung beenden")
@@ -109,6 +136,22 @@ else:
             if monitor.abortRequested():
                 log("SHUTDOWN: abortRequested = True")
                 break
+
+            if window.getProperty(BACKEND_SHUTDOWN) == "1":
+                window.clearProperty(BACKEND_SHUTDOWN)
+
+                if not backend_shutdown_requested:
+                    backend_shutdown_requested = True
+                    log("BACKEND Shutdown-Test gestartet")
+                    browser.browser_backend_shutdown()
+
+            if backend_shutdown_requested:
+                if browser.browser_backend_active() == 0:
+                    log("BACKEND CefShutdown abgeschlossen")
+                    break
+
+                monitor.waitForAbort(0.2)
+                continue
 
             request = window.getProperty(REQUEST)
 
@@ -130,7 +173,9 @@ else:
                 continue
 
             log("RetroPlayer starten")
-            frontend = RetroPlayerFrontend(browser, monitor)
+            frontend = RetroPlayerFrontend(
+                browser, monitor, screen_width, screen_height
+            )
 
             try:
                 frontend.start()
