@@ -20,7 +20,7 @@ addon_dir = Path(__file__).resolve().parent
 pending_file = addon_dir / "install.pending"
 skin_script = addon_dir / "k21_3_c150" / "browser_skin.py"
 # Browser4Kodi: Ausführungsrecht für CEF-Unterprozess sicherstellen
-browser_helper = addon_dir / "k21_3_c150" / "build" / "browser_helper"
+browser_helper = addon_dir / "k21_3_c150" / "build" / "Linux_x64" / "browser_helper"
 
 try:
     if browser_helper.is_file():
