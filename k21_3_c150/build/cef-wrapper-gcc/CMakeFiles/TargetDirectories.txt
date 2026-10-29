@@ -1,5 +1,0 @@
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/CMakeFiles/edit_cache.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/CMakeFiles/rebuild_cache.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/libcef_dll_wrapper/CMakeFiles/libcef_dll_wrapper.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/libcef_dll_wrapper/CMakeFiles/edit_cache.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/cef-wrapper-gcc/libcef_dll_wrapper/CMakeFiles/rebuild_cache.dir

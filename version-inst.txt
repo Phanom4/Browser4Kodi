@@ -30,7 +30,7 @@ cmake -S . -B build && cmake --build build -j 64
 
 
 # ======================
-# Version 2
+# Version 2 cef-bin linux
 # ======================
 
 # Qellen

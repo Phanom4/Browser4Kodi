@@ -1,5 +1,0 @@
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/CMakeFiles/cef_wrapper_gcc_build.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/CMakeFiles/browser.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/CMakeFiles/browser_helper.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/CMakeFiles/edit_cache.dir
-/run/media/kasia/Frank_10_25/make/Browser4Kodi/k21_3_c150/build/CMakeFiles/rebuild_cache.dir
